@@ -57,6 +57,30 @@ function deactivate_woocommerce_loyalty_program() {
 register_activation_hook( __FILE__, 'activate_woocommerce_loyalty_program' );
 register_deactivation_hook( __FILE__, 'deactivate_woocommerce_loyalty_program' );
 
+
+add_action( 'init', 'register_loyalty_program_post_type' );
+
+function register_loyalty_program_post_type() {
+	register_post_type('loyalty_program', array(
+			'labels'				   => array(
+			'name' 					   => __('Dates'),
+			'singular_name'            => __('Date'),
+			'add_new'                  =>  __('Add date', 'woocommerce-loyalty-program'),
+			'add_new_item'             =>  __('Add new date', 'woocommerce-loyalty-program'),
+			'edit_item'                =>  __('Edit date', 'woocommerce-loyalty-program'),
+			'new_item'                 =>  __('New date', 'woocommerce-loyalty-program'),
+			'view_item'                =>  __('Date', 'woocommerce-loyalty-program'),
+			'search_items'             =>  __('Date', 'woocommerce-loyalty-program'),
+			'menu_name' 			   => __( 'Loyalty program', 'woocommerce-loyalty-program' ),
+		),
+		'show_in_menu' => 'loyalty_program',
+		'supports'     => [ 'title', 'custom-fields' ],
+		'public'       => true,
+		'show_in_rest' => false
+	));
+	
+}
+
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.

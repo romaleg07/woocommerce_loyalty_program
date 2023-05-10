@@ -13,5 +13,5 @@
 ?>
 
 <div class="loyalty-program-wrapper-admin wrap">
-    <h1 class="wp-heading-inline"><?php echo __( 'Loyalty program', 'woocommerce-loyalty-program' ); ?></h1>
+    <h1 class="wp-heading-inline"><?php echo __( 'Settings', 'woocommerce-loyalty-program' ); ?></h1>
 </div>

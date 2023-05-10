@@ -19,6 +19,7 @@
  * @subpackage Woocommerce_Loyalty_Program/admin
  * @author     Romaleg
  */
+
 class Woocommerce_Loyalty_Program_Admin {
 
 	/**
@@ -117,34 +118,40 @@ class Woocommerce_Loyalty_Program_Admin {
 		
 		add_submenu_page(
 			'loyalty_program',
-			__( 'All dates', 'woocommerce-loyalty-program' ),
-			__( 'All dates', 'woocommerce-loyalty-program' ),
+			__( 'Settings', 'woocommerce-loyalty-program' ),
+			__( 'Settings', 'woocommerce-loyalty-program' ),
 			'manage_options',
-			'loyalty_program_all_dates',
-			'my_custom_submenu_page_callback'
+			'loyalty_program_settings',
+			array($this, "loyalty_program_settings") 
 		);
 
-		add_submenu_page(
-			'loyalty_program',
-			__( 'Add Date', 'woocommerce-loyalty-program' ),
-			__( 'Add Date', 'woocommerce-loyalty-program' ),
-			'manage_options',
-			'loyalty_program_add_date',
-			'my_custom_submenu_page_callback'
-		);
+		// add_submenu_page(
+		// 	'loyalty_program',
+		// 	__( 'Add Date', 'woocommerce-loyalty-program' ),
+		// 	__( 'Add Date', 'woocommerce-loyalty-program' ),
+		// 	'manage_options',
+		// 	'loyalty_program_add_date',
+		// 	'my_custom_submenu_page_callback'
+		// );
 
-		add_submenu_page(
-			'loyalty_program',
-			__( 'Add Date', 'woocommerce-loyalty-program' ),
-			__( 'Add Date', 'woocommerce-loyalty-program' ),
-			'manage_options',
-			'loyalty_program_add_date',
-			'my_custom_submenu_page_callback'
-		);
+		// add_submenu_page(
+		// 	'loyalty_program',
+		// 	__( 'Add Date', 'woocommerce-loyalty-program' ),
+		// 	__( 'Add Date', 'woocommerce-loyalty-program' ),
+		// 	'manage_options',
+		// 	'loyalty_program_add_date',
+		// 	'my_custom_submenu_page_callback'
+		// );
 	}
 
 
 	public function loyalty_program_admin_page() {
 		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display.php';
 	}
+
+	public function loyalty_program_settings() {
+		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display-settings.php';
+	}
+
+
 }
