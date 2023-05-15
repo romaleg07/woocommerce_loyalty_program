@@ -74,12 +74,45 @@ function register_loyalty_program_post_type() {
 			'menu_name' 			   => __( 'Loyalty program', 'woocommerce-loyalty-program' ),
 		),
 		'show_in_menu' => 'loyalty_program',
-		'supports'     => [ 'title', 'custom-fields' ],
+		'supports'     => [ 'title' ],
 		'public'       => true,
 		'show_in_rest' => false
 	));
 	
 }
+// Добавляем метабокс с кастомным полем
+function add_discount_amount_field_meta_box() {
+    add_meta_box(
+        'add_discount_amount_field_meta_box', // Идентификатор метабокса
+        'Discount amount', // Заголовок метабокса
+        'render_discount_amount_field_meta_box', // Функция для отображения содержимого метабокса
+        'loyalty_program', // Тип записей, для которого будет отображаться метабокс
+        'normal', // Расположение метабокса на странице (нормальное, сайдбар и т. д.)
+        'default' // Приоритет метабокса
+    );
+}
+add_action( 'add_meta_boxes', 'add_discount_amount_field_meta_box' );
+
+// Функция для отображения содержимого метабокса
+function render_discount_amount_field_meta_box( $post ) {
+    // Получаем значение кастомного поля, если оно уже было сохранено
+    $discount_amount_field_value = get_post_meta( $post->ID, 'discount_amount_key', true );
+    ?>
+
+    <label for="discount_amount"><?php echo __('Discount amount (%):', 'woocommerce-loyalty-program');?></label>
+    <input type="text" id="discount_amount" name="discount_amount" value="<?php echo esc_attr( $discount_amount_field_value ); ?>">
+
+    <?php
+}
+
+// Сохраняем значение кастомного поля при сохранении записи
+function save_discount_amount_field( $post_id ) {
+    if ( isset( $_POST['discount_amount'] ) ) {
+        $discount_amount_field_value = sanitize_text_field( $_POST['discount_amount'] );
+        update_post_meta( $post_id, 'discount_amount_key', $discount_amount_field_value );
+    }
+}
+add_action( 'save_post', 'save_discount_amount_field' );
 
 /**
  * The core plugin class that is used to define internationalization,

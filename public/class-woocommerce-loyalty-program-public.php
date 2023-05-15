@@ -51,6 +51,7 @@ class Woocommerce_Loyalty_Program_Public {
 		$this->woocommerce_loyalty_program = $woocommerce_loyalty_program;
 		$this->version = $version;
 
+		add_action( 'woocommerce_register_form', 'add_custom_fields_to_registration_form' );
 	}
 
 	/**
@@ -98,5 +99,35 @@ class Woocommerce_Loyalty_Program_Public {
 		wp_enqueue_script( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'js/woocommerce-loyalty-program-public.js', array( 'jquery' ), $this->version, false );
 
 	}
+
+
+	public function add_custom_fields_to_registration_form() {
+		$custom_post_type = 'loyalty_program'; // Замените на фактический идентификатор вашего кастомного типа записей
+		
+		$posts = get_posts( array(
+			'post_type' => $custom_post_type,
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+		) );
+	
+		$count = count( $posts );
+	
+		for ( $i = 1; $i <= $count; $i++ ) {
+			$field_name = 'custom_field_' . $i;
+			$field_label = 'Custom Field ' . $i;
+			$field_id = 'custom_field_' . $i;
+			$field_required = false; // Можете изменить на false, если поле не обязательное
+	
+			woocommerce_form_field( $field_name, array(
+				'type' => 'text',
+				'class' => array( 'form-row-wide' ),
+				'label' => $field_label,
+				'required' => $field_required,
+				'id' => $field_id,
+			) );
+		}
+	}
+
+
 
 }
