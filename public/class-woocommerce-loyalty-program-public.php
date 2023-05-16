@@ -149,7 +149,7 @@ class Woocommerce_Loyalty_Program_Public {
 					$amount = "5";
 				}
 				$discount_type = 'percent';
-				$coupon_code = 'DATE' . $customer_id . '&' . $post->ID;
+				$coupon_code = 'DATE' . $customer_id . 'EE' . $post->ID;
 
 				$coupon = array(
 					'post_title' => $coupon_code,
@@ -161,6 +161,7 @@ class Woocommerce_Loyalty_Program_Public {
 				$new_coupon_id = wp_insert_post( $coupon );
 
 				$date_exp = strtotime($date_celeb . "+1 days");
+				$date_start = strtotime($date_celeb . "-3 days");
 
 				if ( $new_coupon_id ) {
 
@@ -176,9 +177,11 @@ class Woocommerce_Loyalty_Program_Public {
 					update_post_meta( $new_coupon_id, 'customer_email', array($customer_email) );
 
 					update_post_meta( $new_coupon_id, 'date_expires', $date_exp );
+					update_post_meta( $new_coupon_id, '_wt_coupon_start_date', date('Y-m-d', $date_start) );
 
-					$tomorrow = date('m-d-Y',strtotime($date1 . "+1 days"));
-				
+					update_post_meta( $new_coupon_id, '_user_id', $customer_id );
+					
+					
 				} else {
 				
 					update_user_meta( $customer_id, '_coupon_error', 'create error' );
@@ -186,6 +189,9 @@ class Woocommerce_Loyalty_Program_Public {
 			}
 		}
 	}
+
+
+	
 
 
 }

@@ -124,6 +124,14 @@ class Woocommerce_Loyalty_Program_Admin {
 			'loyalty_program_settings',
 			array($this, "loyalty_program_settings") 
 		);
+		add_submenu_page(
+			'loyalty_program',
+			__( 'Statistics', 'woocommerce-loyalty-program' ),
+			__( 'Statistics', 'woocommerce-loyalty-program' ),
+			'manage_options',
+			'loyalty_program_statistics',
+			array($this, "loyalty_program_statistics") 
+		);
 
 		// add_submenu_page(
 		// 	'loyalty_program',
@@ -150,6 +158,10 @@ class Woocommerce_Loyalty_Program_Admin {
 	}
 
 	public function loyalty_program_settings() {
+		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display-settings.php';
+	}
+
+	public function loyalty_program_statistics() {
 		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display-settings.php';
 	}
 
