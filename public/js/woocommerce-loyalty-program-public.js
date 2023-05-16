@@ -29,4 +29,7 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+	
+	// $('.datePicker_wrapper  input').datepicker();
+
 })( jQuery );

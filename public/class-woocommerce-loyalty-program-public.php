@@ -74,6 +74,7 @@ class Woocommerce_Loyalty_Program_Public {
 		 * class.
 		 */
 
+		// wp_enqueue_style('jqueryui', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css', false, null ); 
 		wp_enqueue_style( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'css/woocommerce-loyalty-program-public.css', array(), $this->version, 'all' );
 
 	}
@@ -97,7 +98,8 @@ class Woocommerce_Loyalty_Program_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'js/woocommerce-loyalty-program-public.js', array( 'jquery' ), $this->version, false );
+		// wp_enqueue_script('jquery-ui-datepicker');
+		wp_enqueue_script( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'js/woocommerce-loyalty-program-public.js', array( 'jquery' ), $this->version, true );
 
 	}
 
@@ -117,7 +119,7 @@ class Woocommerce_Loyalty_Program_Public {
 	
 			woocommerce_form_field( $field_name, array(
 				'type' => 'date',
-				'class' => array( 'form-row-wide' ),
+				'class' => array( 'form-row-wide datePicker_wrapper' ),
 				'label' => $field_label,
 				'required' => $field_required,
 				'id' => $field_id,
@@ -191,7 +193,7 @@ class Woocommerce_Loyalty_Program_Public {
 	}
 
 
-	
+
 
 
 }
