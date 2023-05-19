@@ -146,9 +146,29 @@ class Woocommerce_Loyalty_Program_Public {
 
 							<?php if(!empty($posts)) { ?>
 								<div class="notification_dates-wrapper">
-								<?php foreach($posts as $date): ?>
+								<?php 
+									foreach($posts as $date): 
+									$id = $date->ID;
+									$celeb_date = get_post_meta($id, '_date_discount', true);
+									if(!empty($celeb_date)) {
+										$celeb_date = strtotime($celeb_date);
+										$newformat_date = date("j, F", $celeb_date);
+									}
+									
+								?>
 									<div class="notification_dates-item">
-										<input type="checkbox" name="date_notify">
+										<input type="checkbox" name="date_notify" value="<?php echo $date->post_name; ?>">
+										<span><?php echo $date->post_title; ?></span>
+										<?php if(!empty($celeb_date)): ?>
+										<div class="date-wrapper">
+											<?php echo $newformat_date; ?>
+										</div>
+										<?php else: ?>
+										<div class="date-wrapper chose_date">
+											<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="">
+										</div>
+										<?php endif; ?>
+										
 									</div>
 								<?php endforeach; ?>
 								</div>

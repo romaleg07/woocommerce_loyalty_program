@@ -104,7 +104,7 @@ function render_discount_amount_field_meta_box( $post ) {
 	</p>
 	<p class="form-field _add_date">
 		<label for="_add_date_discount"><?php echo __('Date:', 'woocommerce-loyalty-program');?></label>
-		<input type="text" class="short hasDatepicker" name="_add_date_discount" id="_add_date_discount" value="" placeholder="YYYY-MM-DD" maxlength="10" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])">
+		<input type="text" class="addDatepicker" name="_add_date_discount" id="_add_date_discount" placeholder="DD-MM-YYYY">
 	</p>
 
     <?php
