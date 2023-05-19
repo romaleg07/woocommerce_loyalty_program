@@ -105,6 +105,14 @@ class Woocommerce_Loyalty_Program_Public {
 
 
 	public function add_date_fields_to_registration_form() {
+
+		$posts = get_posts( array(
+			'post_type' => $this->loyalty_program_post_type,
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+		) );
+
+
 		?>
 			<a href="#add_notification_dates" data-open="#add_notification_dates" class="primary is-small button wp-element-button is-outline"><?php echo __( 'Add date', 'woocommerce-loyalty-program' );?></a>
 
@@ -131,16 +139,25 @@ class Woocommerce_Loyalty_Program_Public {
 								<label for="reg_email">Email&nbsp;<span class="required">*</span></label>
 								<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="">
 							</p>
+
+							<p class="add_notification_date--info">
+								<?php echo __( 'Mark the events you want to be notified about. You will receive an email notification a few days before the event. By mail with the offer of the desired package.', 'woocommerce-loyalty-program' );?>
+							</p>
+
+							<?php if(!empty($posts)) { ?>
+								<div class="notification_dates-wrapper">
+								<?php foreach($posts as $date): ?>
+									<div class="notification_dates-item">
+										<input type="checkbox" name="date_notify">
+									</div>
+								<?php endforeach; ?>
+								</div>
+							<?php } ?>
 						</div>
 					</div>
 				</div>
 			</div>
 		<?php
-		$posts = get_posts( array(
-			'post_type' => $this->loyalty_program_post_type,
-			'post_status' => 'publish',
-			'posts_per_page' => -1,
-		) );
 	
 		foreach($posts as $post) {
 			$field_name = $post->post_name;
