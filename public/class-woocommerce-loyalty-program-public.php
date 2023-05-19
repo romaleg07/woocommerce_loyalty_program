@@ -105,6 +105,37 @@ class Woocommerce_Loyalty_Program_Public {
 
 
 	public function add_date_fields_to_registration_form() {
+		?>
+			<a href="#add_notification_dates" data-open="#add_notification_dates" class="primary is-small button wp-element-button is-outline"><?php echo __( 'Add date', 'woocommerce-loyalty-program' );?></a>
+
+			<p class="form-row">
+				<label class="woocommerce-form__label woocommerce-form__label-for-checkbox woocommerce-form-login__notification_flag">
+					<input class="woocommerce-form__input woocommerce-form__input-checkbox" name="notification_flag" type="checkbox" id="notification_flag" value="1"> <span><?php echo __( 'send an e-mail and sms reminder about an important event. A discount code will be attached to each message, which will give you the opportunity to buy goods on our website up to 10% cheaper', 'woocommerce-loyalty-program' );?></span>
+				</label>
+			</p>
+
+			<div id="add_notification_dates" class="dark text-center mfp-hide lightbox-content">
+				<div class="account-container lightbox-inner">
+					<div class="row row-divided row-large" id="add_user_date">
+						<div class="col-1 large-12 col pb-0">
+							<h3 class="uppercase"><?php echo __( 'Add date notification', 'woocommerce-loyalty-program' );?></h3>
+							<p class="form-row form-row-first">
+								<label for="add_date_new_firs_name"><?php echo __( 'First Name', 'woocommerce-loyalty-program' );?> <span class="required">*</span></label>
+								<input type="text" class="input-text" name="add_date_new_firs_name" id="add_date_new_firs_name" value="">
+							</p>
+							<p class="form-row form-row-last">
+								<label for="add_date_new_firs_name"><?php echo __( 'Last Name', 'woocommerce-loyalty-program' );?> <span class="required">*</span></label>
+								<input type="text" class="input-text" name="add_date_new_last_name" id="add_date_new_firs_name" value="">
+							</p>
+							<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+								<label for="reg_email">Email&nbsp;<span class="required">*</span></label>
+								<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="">
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		<?php
 		$posts = get_posts( array(
 			'post_type' => $this->loyalty_program_post_type,
 			'post_status' => 'publish',
@@ -136,6 +167,10 @@ class Woocommerce_Loyalty_Program_Public {
 		) );
 		$customer_data = get_userdata( $customer_id );
 		$customer_email = $customer_data->user_email;
+
+
+		$notification_flag = $_POST[ 'notification_flag' ];
+		update_user_meta( $customer_id, 'notification_flag', $notification_flag );
 
 		foreach($posts as $post) {
 			$field_name = $post->post_name;

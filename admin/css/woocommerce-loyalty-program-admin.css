@@ -1,3 +1,15 @@
 /**
  * All of the CSS for your admin-specific functionality should be included in this file.
  */
+
+#add_discount_amount_field_meta_box label {
+    width: 150px;
+    display: block;
+    margin-right: 15px;
+}
+#add_discount_amount_field_meta_box .form-field {
+    display: flex;
+}
+#add_discount_amount_field_meta_box input {
+    width: calc(100% - 165px);
+}

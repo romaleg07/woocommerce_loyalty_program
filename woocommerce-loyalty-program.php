@@ -98,9 +98,14 @@ function render_discount_amount_field_meta_box( $post ) {
     // Получаем значение кастомного поля, если оно уже было сохранено
     $discount_amount_field_value = get_post_meta( $post->ID, 'discount_amount_key', true );
     ?>
-
-    <label for="discount_amount"><?php echo __('Discount amount (%):', 'woocommerce-loyalty-program');?></label>
-    <input type="text" id="discount_amount" name="discount_amount" value="<?php echo esc_attr( $discount_amount_field_value ); ?>">
+	<p class="form-field _add_discount">
+		<label for="discount_amount"><?php echo __('Discount amount (%):', 'woocommerce-loyalty-program');?></label>
+		<input type="text" id="discount_amount" name="discount_amount" value="<?php echo esc_attr( $discount_amount_field_value ); ?>">
+	</p>
+	<p class="form-field _add_date">
+		<label for="_add_date_discount"><?php echo __('Date:', 'woocommerce-loyalty-program');?></label>
+		<input type="text" class="short hasDatepicker" name="_add_date_discount" id="_add_date_discount" value="" placeholder="YYYY-MM-DD" maxlength="10" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])">
+	</p>
 
     <?php
 }
@@ -110,6 +115,11 @@ function save_discount_amount_field( $post_id ) {
     if ( isset( $_POST['discount_amount'] ) ) {
         $discount_amount_field_value = sanitize_text_field( $_POST['discount_amount'] );
         update_post_meta( $post_id, 'discount_amount_key', $discount_amount_field_value );
+    }
+
+	if ( isset( $_POST['_add_date_discount'] ) ) {
+        $date_discount = sanitize_text_field( $_POST['_add_date_discount'] );
+        update_post_meta( $post_id, '_date_discount', $date_discount );
     }
 }
 add_action( 'save_post', 'save_discount_amount_field' );

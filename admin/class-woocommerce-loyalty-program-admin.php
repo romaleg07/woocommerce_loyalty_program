@@ -162,7 +162,7 @@ class Woocommerce_Loyalty_Program_Admin {
 	}
 
 	public function loyalty_program_statistics() {
-		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display-settings.php';
+		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display-statistics.php';
 	}
 
 
