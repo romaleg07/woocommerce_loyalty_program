@@ -74,7 +74,7 @@ class Woocommerce_Loyalty_Program_Public {
 		 * class.
 		 */
 
-		// wp_enqueue_style('jqueryui', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css', false, null ); 
+		wp_enqueue_style('jqueryui', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css', false, null ); 
 		wp_enqueue_style( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'css/woocommerce-loyalty-program-public.css', array(), $this->version, 'all' );
 
 	}
@@ -98,7 +98,7 @@ class Woocommerce_Loyalty_Program_Public {
 		 * class.
 		 */
 
-		// wp_enqueue_script('jquery-ui-datepicker');
+		wp_enqueue_script('jquery-ui-datepicker');
 		wp_enqueue_script( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'js/woocommerce-loyalty-program-public.js', array( 'jquery' ), $this->version, true );
 
 	}
@@ -128,17 +128,17 @@ class Woocommerce_Loyalty_Program_Public {
 						<div class="col-1 large-12 col pb-0">
 							<h3 class="uppercase"><?php echo __( 'Add date notification', 'woocommerce-loyalty-program' );?></h3>
 							<p class="form-row form-row-first">
-								<label for="add_date_new_firs_name"><?php echo __( 'First Name', 'woocommerce-loyalty-program' );?> <span class="required">*</span></label>
+								<label for="add_date_new_firs_name"><?php echo __( 'First Name', 'woocommerce-loyalty-program' );?></label>
 								<input type="text" class="input-text" name="add_date_new_firs_name" id="add_date_new_firs_name" value="">
 							</p>
 							<p class="form-row form-row-last">
-								<label for="add_date_new_firs_name"><?php echo __( 'Last Name', 'woocommerce-loyalty-program' );?> <span class="required">*</span></label>
-								<input type="text" class="input-text" name="add_date_new_last_name" id="add_date_new_firs_name" value="">
+								<label for="add_date_new_firs_name"><?php echo __( 'Last Name', 'woocommerce-loyalty-program' );?></label>
+								<input type="text" class="input-text" name="add_date_new_last_name" id="add_date_new_last_name" value="">
 							</p>
-							<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+							<!-- <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 								<label for="reg_email">Email&nbsp;<span class="required">*</span></label>
 								<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="">
-							</p>
+							</p> -->
 
 							<p class="add_notification_date--info">
 								<?php echo __( 'Mark the events you want to be notified about. You will receive an email notification a few days before the event. By mail with the offer of the desired package.', 'woocommerce-loyalty-program' );?>
@@ -164,13 +164,14 @@ class Woocommerce_Loyalty_Program_Public {
 											<?php echo $newformat_date; ?>
 										</div>
 										<?php else: ?>
-										<div class="date-wrapper chose_date">
-											<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="">
+										<div class="date-wrapper datePicker_wrapper chose_date">
+											<input type="text" class="woocommerce-Input woocommerce-Input--text input-date_with_datepicker input-text" placeholder="<?php echo __( 'Choose date', 'woocommerce-loyalty-program' );?>" name="chosen_date_<?php echo $date->post_name; ?>" id="chosen_date_<?php echo $date->post_name; ?>" autocomplete="off">
 										</div>
 										<?php endif; ?>
 										
 									</div>
 								<?php endforeach; ?>
+								<a href="#" id="add_new_date_notification" class="woocommerce-button button"><?php echo __( 'Add', 'woocommerce-loyalty-program' );?></a>
 								</div>
 							<?php } ?>
 						</div>

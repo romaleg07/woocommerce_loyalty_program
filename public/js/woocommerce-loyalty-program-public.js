@@ -30,6 +30,29 @@
 	 */
 
 	
-	// $('.datePicker_wrapper  input').datepicker();
+	$('.datePicker_wrapper  input').datepicker();
+
+	$('.notification_dates-item').on('click', function() {
+		const checkbox = $(this).find('input[type="checkbox"]')
+		checkbox.prop("checked", !checkbox.prop("checked"));
+		$(this).toggleClass('checked')
+	})
+
+	$('#add_new_date_notification').on('click', function() {
+		const wrapper_date = $('#add_notification_dates')
+		const name_date = $('#add_date_new_firs_name').val()
+		$('#add_date_new_firs_name').val('')
+		const last_name_date = $('#add_date_new_last_name').val()
+		$('#add_date_new_last_name').val('')
+
+		$('.notification_dates-item').each(function() {
+			if($(this).find('input[type="checkbox"]').is(':checked')) {
+
+			}
+		})
+
+		return false;
+	})
+	
 
 })( jQuery );

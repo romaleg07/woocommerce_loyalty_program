@@ -9,3 +9,49 @@
     color: #333;
     text-align: left;
 }
+.notification_dates-item {
+    display: flex;
+    border: 1px solid #ececec;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+.notification_dates-item * {
+    margin-bottom: 0;
+}
+.notification_dates-item input[type=checkbox] {
+    display: none;
+}
+.notification_dates-item > span {
+    position: relative;
+    display: flex;
+}
+.notification_dates-item > span::before {
+    border: 1px solid #A9A9A9;
+    border-radius: 3px;
+    display: block;
+    content: '';
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    left: 0;
+    top: 0;
+    margin-top: 6px;
+}
+.notification_dates-item.checked > span::after {
+    background-color: #31b331;
+    position: absolute;
+    top: 8px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    display: block;
+    content: '';
+    border-radius: 3px;
+}
+.notification_dates-wrapper {
+    margin-bottom: 15px;
+}
