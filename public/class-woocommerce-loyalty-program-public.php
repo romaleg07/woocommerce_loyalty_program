@@ -153,6 +153,7 @@ class Woocommerce_Loyalty_Program_Public {
 									if(!empty($celeb_date)) {
 										$celeb_date = strtotime($celeb_date);
 										$newformat_date = date("j, F", $celeb_date);
+										$newformat_date_value = date("d.m.y", $celeb_date);
 									}
 									
 								?>
@@ -162,6 +163,7 @@ class Woocommerce_Loyalty_Program_Public {
 										<?php if(!empty($celeb_date)): ?>
 										<div class="date-wrapper">
 											<?php echo $newformat_date; ?>
+											<input type="hidden" name="" class="input-date_with_datepicker" value="<?php echo $newformat_date_value; ?>" id="">
 										</div>
 										<?php else: ?>
 										<div class="date-wrapper datePicker_wrapper chose_date">

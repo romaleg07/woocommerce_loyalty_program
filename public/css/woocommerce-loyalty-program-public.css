@@ -55,3 +55,6 @@
 .notification_dates-wrapper {
     margin-bottom: 15px;
 }
+.input-date_with_datepicker.empty {
+    border-color: red;
+}
