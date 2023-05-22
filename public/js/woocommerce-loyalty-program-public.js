@@ -69,7 +69,13 @@
 				let visible_date = date.split('.')
 				visible_date = `${visible_date[0]}.${visible_date[1]}`
 
-				let html = `<div class="item_added_dates" class=""><span class="name">${name_date} ${last_name_date}</span><span class="date">${visible_date}</span><input type="hidden" value="${date}" name="not_dates[]"><input type="hidden" name="not_dates_name[] value="${name_date} ${last_name_date}"><span class="delete">x</span></div>`
+				let generated_class = `${date_slug}${name_date.replaceAll(/\s/g,'')}${last_name_date.replaceAll(/\s/g,'')}`
+
+				if($(`.${generated_class}`).length) {
+					$(`.${generated_class}`).remove()
+				}
+
+				let html = `<div class="item_added_dates ${generated_class}"><span class="name">${name_date} ${last_name_date}</span><span class="date">${visible_date}</span><input type="hidden" value="${date}" name="notify_dates[]"><input type="hidden" name="notify_dates_name[]" value="${name_date} ${last_name_date}"><span class="delete"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></div>`
 				button.before(html)
 			} else {
 				$(this).find('.input-date_with_datepicker').removeClass('empty')
@@ -86,6 +92,10 @@
 			}
 		})
 		$('#add_notification_dates').magnificPopup('close')
+
+		$('.item_added_dates .delete').on('click', function() {
+			$(this).parent().remove()
+		})
 
 		return false;
 	})

@@ -182,90 +182,95 @@ class Woocommerce_Loyalty_Program_Public {
 			</div>
 		<?php
 	
-		foreach($posts as $post) {
-			$field_name = $post->post_name;
-			$field_label = $post->post_title;
-			$field_id =  $post->post_name;
-			$field_required = false; // Можете изменить на false, если поле не обязательное
+		// foreach($posts as $post) {
+		// 	$field_name = $post->post_name;
+		// 	$field_label = $post->post_title;
+		// 	$field_id =  $post->post_name;
+		// 	$field_required = false; // Можете изменить на false, если поле не обязательное
 	
-			woocommerce_form_field( $field_name, array(
-				'type' => 'date',
-				'class' => array( 'form-row-wide datePicker_wrapper' ),
-				'label' => $field_label,
-				'required' => $field_required,
-				'id' => $field_id,
-			) );
+		// 	woocommerce_form_field( $field_name, array(
+		// 		'type' => 'date',
+		// 		'class' => array( 'form-row-wide datePicker_wrapper' ),
+		// 		'label' => $field_label,
+		// 		'required' => $field_required,
+		// 		'id' => $field_id,
+		// 	) );
 			
-		}
+		// }
 	}
 
-	public function save_gate_fields_on_registration( $customer_id ) {    
-		$posts = get_posts( array(
-			'post_type' =>  $this->loyalty_program_post_type,
-			'post_status' => 'publish',
-			'posts_per_page' => -1,
-		) );
-		$customer_data = get_userdata( $customer_id );
-		$customer_email = $customer_data->user_email;
+	public function save_gate_fields_on_registration( $customer_id ) {
+		$test = json_encode($_POST);
+		update_user_meta( $customer_id, 'test', $test );
+	}
+
+	// public function save_gate_fields_on_registration( $customer_id ) {    
+	// 	$posts = get_posts( array(
+	// 		'post_type' =>  $this->loyalty_program_post_type,
+	// 		'post_status' => 'publish',
+	// 		'posts_per_page' => -1,
+	// 	) );
+	// 	$customer_data = get_userdata( $customer_id );
+	// 	$customer_email = $customer_data->user_email;
 
 
-		$notification_flag = $_POST[ 'notification_flag' ];
-		update_user_meta( $customer_id, 'notification_flag', $notification_flag );
+	// 	$notification_flag = $_POST[ 'notification_flag' ];
+	// 	update_user_meta( $customer_id, 'notification_flag', $notification_flag );
 
-		foreach($posts as $post) {
-			$field_name = $post->post_name;
-			if ( isset( $_POST[ $field_name ] ) and !empty(  $_POST[ $field_name ] ) ) {
-				$date_celeb = $_POST[ $field_name ];
-				$meta_key = $field_name;
-				$meta_value = sanitize_text_field( $_POST[ $field_name ] );
+	// 	foreach($posts as $post) {
+	// 		$field_name = $post->post_name;
+	// 		if ( isset( $_POST[ $field_name ] ) and !empty(  $_POST[ $field_name ] ) ) {
+	// 			$date_celeb = $_POST[ $field_name ];
+	// 			$meta_key = $field_name;
+	// 			$meta_value = sanitize_text_field( $_POST[ $field_name ] );
 	
-				update_user_meta( $customer_id, $meta_key, $meta_value );
+	// 			update_user_meta( $customer_id, $meta_key, $meta_value );
 				
-				$amount = get_post_meta($post->ID, 'discount_amount_key', true);
-				if(empty($amount)) {
-					$amount = "5";
-				}
-				$discount_type = 'percent';
-				$coupon_code = 'DATE' . $customer_id . 'EE' . $post->ID;
+	// 			$amount = get_post_meta($post->ID, 'discount_amount_key', true);
+	// 			if(empty($amount)) {
+	// 				$amount = "5";
+	// 			}
+	// 			$discount_type = 'percent';
+	// 			$coupon_code = 'DATE' . $customer_id . 'EE' . $post->ID;
 
-				$coupon = array(
-					'post_title' => $coupon_code,
-					'post_content' => '',
-					'post_status' => 'publish',
-					'post_author' => 1,
-					'post_type' => 'shop_coupon' );
+	// 			$coupon = array(
+	// 				'post_title' => $coupon_code,
+	// 				'post_content' => '',
+	// 				'post_status' => 'publish',
+	// 				'post_author' => 1,
+	// 				'post_type' => 'shop_coupon' );
 					
-				$new_coupon_id = wp_insert_post( $coupon );
+	// 			$new_coupon_id = wp_insert_post( $coupon );
 
-				$date_exp = strtotime($date_celeb . "+1 days");
-				$date_start = strtotime($date_celeb . "-3 days");
+	// 			$date_exp = strtotime($date_celeb . "+1 days");
+	// 			$date_start = strtotime($date_celeb . "-3 days");
 
-				if ( $new_coupon_id ) {
+	// 			if ( $new_coupon_id ) {
 
-					update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
-					update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
-					update_post_meta( $new_coupon_id, 'individual_use', 'yes' );
+	// 				update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
+	// 				update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
+	// 				update_post_meta( $new_coupon_id, 'individual_use', 'yes' );
 										
-					update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
-					update_post_meta( $new_coupon_id, 'usage_limit', '1' );
-					update_post_meta( $new_coupon_id, 'expiry_date', '' );
-					update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
-					update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
-					update_post_meta( $new_coupon_id, 'customer_email', array($customer_email) );
+	// 				update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
+	// 				update_post_meta( $new_coupon_id, 'usage_limit', '1' );
+	// 				update_post_meta( $new_coupon_id, 'expiry_date', '' );
+	// 				update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
+	// 				update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
+	// 				update_post_meta( $new_coupon_id, 'customer_email', array($customer_email) );
 
-					update_post_meta( $new_coupon_id, 'date_expires', $date_exp );
-					update_post_meta( $new_coupon_id, '_wt_coupon_start_date', date('Y-m-d', $date_start) );
+	// 				update_post_meta( $new_coupon_id, 'date_expires', $date_exp );
+	// 				update_post_meta( $new_coupon_id, '_wt_coupon_start_date', date('Y-m-d', $date_start) );
 
-					update_post_meta( $new_coupon_id, '_user_id', $customer_id );
+	// 				update_post_meta( $new_coupon_id, '_user_id', $customer_id );
 					
 					
-				} else {
+	// 			} else {
 				
-					update_user_meta( $customer_id, '_coupon_error', 'create error' );
-				}
-			}
-		}
-	}
+	// 				update_user_meta( $customer_id, '_coupon_error', 'create error' );
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 
 

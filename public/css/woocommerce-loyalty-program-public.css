@@ -58,3 +58,18 @@
 .input-date_with_datepicker.empty {
     border-color: red;
 }
+.item_added_dates {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 10px;
+}
+.item_added_dates .delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+}
+.item_added_dates .date {
+    margin-right: 25px;
+}
