@@ -52,6 +52,7 @@
 		let date
 		let date_slug
 
+
 		date_arr['name'] = name_date
 		date_arr['last_name'] = last_name_date
 
@@ -75,7 +76,7 @@
 					$(`.${generated_class}`).remove()
 				}
 
-				let html = `<div class="item_added_dates ${generated_class}"><span class="name">${name_date} ${last_name_date}</span><span class="date">${visible_date}</span><input type="hidden" value="${date}" name="notify_dates[]"><input type="hidden" name="notify_dates_name[]" value="${name_date} ${last_name_date}"><span class="delete"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></div>`
+				let html = `<div class="item_added_dates ${generated_class}"><span class="name">${name_date} ${last_name_date}</span><span class="date">${visible_date}</span><input type="hidden" value="${date_slug}||${date}" name="notify_dates[]"><input type="hidden" name="notify_dates_name[]" value="${name_date} ${last_name_date}"><span class="delete"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></div>`
 				button.before(html)
 			} else {
 				$(this).find('.input-date_with_datepicker').removeClass('empty')

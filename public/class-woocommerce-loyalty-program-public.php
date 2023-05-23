@@ -202,6 +202,93 @@ class Woocommerce_Loyalty_Program_Public {
 	public function save_gate_fields_on_registration( $customer_id ) {
 		$test = json_encode($_POST);
 		update_user_meta( $customer_id, 'test', $test );
+
+		$posts = get_posts( array(
+			'post_type' =>  $this->loyalty_program_post_type,
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+		) );
+		
+		$notification_flag = $_POST[ 'notification_flag' ];
+		update_user_meta( $customer_id, 'notification_flag', $notification_flag );
+
+
+
+		$customer_data = get_userdata( $customer_id );
+		$customer_email = $customer_data->user_email;
+		$customer_phone = get_usermeta($customer_id, 'billing_phone', true);
+
+		$notify_dates = $_POST['notify_dates'];
+		$notify_dates_names = $_POST['notify_dates_name'];
+
+		foreach($notify_dates as $key => $value) {
+			$name_celebrate = $notify_dates_names[$key];
+			$all_string = $name_celebrate . $value;
+			$key_hash = substr(sha1($all_string), 10);
+			$discount_type = 'percent';
+			$coupon_code = 'DT' . $customer_id . 'EE' . $key_hash;
+
+			$date_arr = explode('||', $value);
+			$date_celeb = $date_arr[1];
+			
+			$coupon = array(
+				'post_title' => $coupon_code,
+				'post_content' => '',
+				'post_status' => 'publish',
+				'post_author' => 1,
+				'post_type' => 'shop_coupon' );
+				
+			$new_coupon_id = wp_insert_post( $coupon );
+
+			$date_exp = strtotime($date_celeb . "+1 days");
+			$date_start = strtotime($date_celeb . "-3 days");
+
+			$args = array(
+				'name'        => $date_arr[0],
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+				'numberposts' => 1
+			);
+
+			$current_celebrate = get_posts($args);
+			if( $current_celebrate ) {
+				$new_coupon_id = wp_insert_post( $coupon );
+
+				$amount = get_post_meta($current_celebrate[0]->ID, 'discount_amount_key', true);
+				if(empty($amount)) {
+					$amount = "10";
+				}
+
+				if ( $new_coupon_id ) {
+
+					update_post_meta( $new_coupon_id, 'discount_type', $discount_type );
+					update_post_meta( $new_coupon_id, 'coupon_amount', $amount );
+					update_post_meta( $new_coupon_id, 'individual_use', 'yes' );
+										
+					update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
+					update_post_meta( $new_coupon_id, 'usage_limit', '1' );
+					update_post_meta( $new_coupon_id, 'expiry_date', '' );
+					update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
+					update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
+					update_post_meta( $new_coupon_id, 'customer_email', array($customer_email) );
+	
+					update_post_meta( $new_coupon_id, 'date_expires', $date_exp );
+					update_post_meta( $new_coupon_id, '_wt_coupon_start_date', date('Y-m-d', $date_start) );
+	
+					update_post_meta( $new_coupon_id, '_user_id', $customer_id );
+					
+					
+				} else {
+				
+					update_user_meta( $customer_id, '_coupon_error', 'create error' );
+				}
+	
+
+			} else {
+				update_user_meta( $customer_id, '_coupon_error', 'celebration date notfound' . $date_arr[0] );
+			}
+		}
+
 	}
 
 	// public function save_gate_fields_on_registration( $customer_id ) {    
