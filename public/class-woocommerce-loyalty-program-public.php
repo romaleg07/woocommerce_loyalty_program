@@ -202,12 +202,6 @@ class Woocommerce_Loyalty_Program_Public {
 	public function save_gate_fields_on_registration( $customer_id ) {
 		$test = json_encode($_POST);
 		update_user_meta( $customer_id, 'test', $test );
-
-		$posts = get_posts( array(
-			'post_type' =>  $this->loyalty_program_post_type,
-			'post_status' => 'publish',
-			'posts_per_page' => -1,
-		) );
 		
 		$notification_flag = $_POST[ 'notification_flag' ];
 		update_user_meta( $customer_id, 'notification_flag', $notification_flag );
@@ -224,12 +218,16 @@ class Woocommerce_Loyalty_Program_Public {
 		foreach($notify_dates as $key => $value) {
 			$name_celebrate = $notify_dates_names[$key];
 			$all_string = $name_celebrate . $value;
-			$key_hash = substr(sha1($all_string), 10);
+			$key_hash = strtolower(substr(sha1($all_string), 0, 10));
+			update_user_meta( $customer_id, 'test_key_hash' . $key_hash );
 			$discount_type = 'percent';
 			$coupon_code = 'DT' . $customer_id . 'EE' . $key_hash;
 
 			$date_arr = explode('||', $value);
 			$date_celeb = $date_arr[1];
+
+			update_user_meta( $customer_id, 'test_name_date' . $key, $date_arr[0] );
+			update_user_meta( $customer_id, 'test_date_date' . $key, $date_arr[1] );
 			
 			$coupon = array(
 				'post_title' => $coupon_code,
@@ -237,20 +235,19 @@ class Woocommerce_Loyalty_Program_Public {
 				'post_status' => 'publish',
 				'post_author' => 1,
 				'post_type' => 'shop_coupon' );
-				
-			$new_coupon_id = wp_insert_post( $coupon );
 
 			$date_exp = strtotime($date_celeb . "+1 days");
 			$date_start = strtotime($date_celeb . "-3 days");
 
 			$args = array(
 				'name'        => $date_arr[0],
-				'post_type'   => 'post',
+				'post_type'   => 'loyalty_program',
 				'post_status' => 'publish',
 				'numberposts' => 1
 			);
 
 			$current_celebrate = get_posts($args);
+			update_user_meta( $customer_id, 'test_test' . $key, json_encode($current_celebrate) );
 			if( $current_celebrate ) {
 				$new_coupon_id = wp_insert_post( $coupon );
 
