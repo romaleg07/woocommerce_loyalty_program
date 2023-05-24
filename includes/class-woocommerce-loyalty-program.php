@@ -72,11 +72,12 @@ class Woocommerce_Loyalty_Program {
 			$this->version = '1.0.0';
 		}
 		$this->woocommerce_loyalty_program = 'woocommerce-loyalty-program';
-
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
-		$this->define_public_hooks();
+		if (get_option( 'woocommerce_loyalty_plugin_enabled', false )):
+			$this->define_public_hooks();
+		endif;
 	}
 
 	/**
