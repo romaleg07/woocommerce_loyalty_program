@@ -13,3 +13,14 @@
 #add_discount_amount_field_meta_box input {
     width: calc(100% - 165px);
 }
+.settings-loyalty-wrapper .form-row-last {
+    display: flex;
+}
+.settings-loyalty-wrapper .form-row-last label {
+    display: block;
+    width: 270px;
+    margin-right: 30px;
+}
+.settings-loyalty-wrapper .form-row-last input {
+    width: calc(100% - 300px);
+}
