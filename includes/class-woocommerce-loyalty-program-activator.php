@@ -28,6 +28,9 @@ class Woocommerce_Loyalty_Program_Activator {
 	 *
 	 * @since    1.0.0
 	 */
+
+	# Singleton
+
 	public static function activate() {
 		add_option( 'woocommerce_loyalty_program_api_url', 'https://api.sendpulse.com' );
 		add_option( 'woocommerce_loyalty_plugin_enabled', false );
@@ -38,5 +41,5 @@ class Woocommerce_Loyalty_Program_Activator {
 		add_option( 'woocommerce_loyalty_id_address_book', '' );
 		add_option( 'woocommerce_loyalty_send_statistic_to_sendpulse', false );
 	}
-
+ 
 }

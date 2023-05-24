@@ -97,6 +97,8 @@ add_action( 'add_meta_boxes', 'add_discount_amount_field_meta_box' );
 function render_discount_amount_field_meta_box( $post ) {
     // Получаем значение кастомного поля, если оно уже было сохранено
     $discount_amount_field_value = get_post_meta( $post->ID, 'discount_amount_key', true );
+	$id_email_notif = get_post_meta( $post->ID, '_id_email_sendpulse', true );
+	$date_discount = get_post_meta( $post->ID, '_date_discount', true );
     ?>
 	<p class="form-field _add_discount">
 		<label for="discount_amount"><?php echo __('Discount amount (%):', 'woocommerce-loyalty-program');?></label>
@@ -104,7 +106,11 @@ function render_discount_amount_field_meta_box( $post ) {
 	</p>
 	<p class="form-field _add_date">
 		<label for="_add_date_discount"><?php echo __('Date:', 'woocommerce-loyalty-program');?></label>
-		<input type="text" class="addDatepicker" name="_add_date_discount" id="_add_date_discount" placeholder="DD-MM-YYYY">
+		<input type="text" class="addDatepicker" name="_add_date_discount" id="_add_date_discount" placeholder="DD-MM-YYYY" value="<?php echo esc_attr( $date_discount ); ?>">
+	</p>
+	<p class="form-field">
+		<label for="_id_email_sendpulse"><?php echo __('Id in mailing list in SendPulse:', 'woocommerce-loyalty-program');?></label>
+		<input type="text" name="_id_email_sendpulse" id="_id_email_sendpulse"  value="<?php echo esc_attr( $id_email_notif ); ?>">
 	</p>
 
     <?php
@@ -119,10 +125,37 @@ function save_discount_amount_field( $post_id ) {
 
 	if ( isset( $_POST['_add_date_discount'] ) ) {
         $date_discount = sanitize_text_field( $_POST['_add_date_discount'] );
+		$date_discount = str_replace('/', '.', $date_discount);
         update_post_meta( $post_id, '_date_discount', $date_discount );
+    }
+
+	if ( isset( $_POST['_id_email_sendpulse'] ) ) {
+        $id_email_sendpulse = sanitize_text_field( $_POST['_id_email_sendpulse'] );
+        update_post_meta( $post_id, '_id_email_sendpulse', $id_email_sendpulse );
     }
 }
 add_action( 'save_post', 'save_discount_amount_field' );
+
+
+require plugin_dir_path( __FILE__ ) . 'includes/class-woocommerce-loyalty-program-webhook.php';
+
+/**
+ * Begins execution of the plugin.
+ *
+ * Since everything within the plugin is registered via hooks,
+ * then kicking off the plugin from this point in the file does
+ * not affect the page life cycle.
+ *
+ * @since    1.0.0
+ */
+function add_webhook() {
+
+	$webhook = new LoyaltyProgramWebhook();
+	$webhook->add_webhook();
+
+}
+
+add_action( 'init', 'add_webhook' );
 
 /**
  * The core plugin class that is used to define internationalization,

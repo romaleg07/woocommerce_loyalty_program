@@ -167,5 +167,4 @@ class Woocommerce_Loyalty_Program_Admin {
 		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display-statistics.php';
 	}
 
-
 }

@@ -153,7 +153,7 @@ class Woocommerce_Loyalty_Program_Public {
 									if(!empty($celeb_date)) {
 										$celeb_date = strtotime($celeb_date);
 										$newformat_date = date("j, F", $celeb_date);
-										$newformat_date_value = date("d.m.y", $celeb_date);
+										$newformat_date_value = date("d.m.Y", $celeb_date);
 									}
 									
 								?>
@@ -231,16 +231,18 @@ class Woocommerce_Loyalty_Program_Public {
 		foreach($notify_dates as $key => $value) {
 			$name_celebrate = $notify_dates_names[$key];
 			$all_string = $name_celebrate . $value;
-			$key_hash = strtolower(substr(sha1($all_string), 0, 10));
-			update_user_meta( $customer_id, 'test_key_hash' . $key_hash );
+			$key_hash = substr(sha1($all_string), 0, 10);
+			// update_user_meta( $customer_id, 'test_key_hash' . $key_hash,  );
 			$discount_type = 'percent';
-			$coupon_code = 'DT' . $customer_id . 'EE' . $key_hash;
+			$coupon_code = 'DT' . $customer_id . 'EE' . strtolower($key_hash);
 
 			$date_arr = explode('||', $value);
 			$date_celeb = $date_arr[1];
 
 			update_user_meta( $customer_id, 'test_name_date' . $key, $date_arr[0] );
 			update_user_meta( $customer_id, 'test_date_date' . $key, $date_arr[1] );
+
+			update_user_meta( $customer_id, 'test_name_celebrate' . $key, $name_celebrate );
 			
 			$coupon = array(
 				'post_title' => $coupon_code,
@@ -250,7 +252,10 @@ class Woocommerce_Loyalty_Program_Public {
 				'post_type' => 'shop_coupon' );
 
 			$date_exp = strtotime($date_celeb . "+1 days");
-			$date_start = strtotime($date_celeb . "-3 days");
+			$date_start = strtotime($date_celeb . "-6 days");
+
+			update_user_meta( $customer_id, '_date_exp_' . $date_arr[0], $date_exp );
+			update_user_meta( $customer_id, '_date_strt_'  . $date_arr[0], $date_start );
 
 			$args = array(
 				'name'        => $date_arr[0],
@@ -266,6 +271,10 @@ class Woocommerce_Loyalty_Program_Public {
 			$date_for_sendpulse_array = explode('.', $date_arr[1]);
 			$date_for_sendpulse = $date_for_sendpulse_array[1] . '/' .$date_for_sendpulse_array[0] . '/' . $date_for_sendpulse_array[2];
 			$data_array['variables'][$date_arr[0]] = $date_for_sendpulse;
+
+			if($name_celebrate != '- -') {
+				$data_array['variables']['name_'.$date_arr[0]] = $name_celebrate;
+			}
 
 			if( $current_celebrate ) {
 				$new_coupon_id = wp_insert_post( $coupon );
@@ -295,7 +304,7 @@ class Woocommerce_Loyalty_Program_Public {
 
 					update_user_meta( $customer_id, 'coupon_for_' . $date_arr[0], $coupon_code );
 					
-					$data_array['variables']['coupon_' . $date_arr[0]] = $new_coupon_id;
+					$data_array['variables']['coupon_' . $date_arr[0]] = $coupon_code;
 				} else {
 				
 					update_user_meta( $customer_id, '_coupon_error', 'create error' );
@@ -307,9 +316,14 @@ class Woocommerce_Loyalty_Program_Public {
 				update_user_meta( $customer_id, '_coupon_error', 'celebration date notfound' . $date_arr[0] );
 			}
 
-			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
-
 		}
+
+		if($notification_flag) {
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
+			$sendPulse = new SendPulseApi;
+			$sendPulse->add_new_and_change_address($data_array, $customer_id);
+		}
+		
 
 	}
 
