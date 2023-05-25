@@ -367,7 +367,7 @@ class Woocommerce_Loyalty_Program_Public {
 						$generated_slug = get_user_meta($user_id, 'test_name_date' . $i, true);
 						$pattern = '/\s+/';
 						$name_clean = preg_replace($pattern, '', $name_celeb);
-						$generated_slug .= $name_clean;
+						// $generated_slug .= $name_clean;
 					?>
 						<div class="item <?php echo $generated_slug; ?>">
 							<div class="name"><?php echo $name_celeb; ?></div>
