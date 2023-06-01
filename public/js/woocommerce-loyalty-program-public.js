@@ -144,7 +144,7 @@
 
 				let html = `<div class="item ${date_slug}"><div class="name">${name_date} ${last_name_date}</div>`
 				html += `<div class="date ">${visible_date}</div>`
-				html += `<div class="change-delete"><a href="#" class="change_date_pa">Change</a>`
+				html += `<div class="change-delete"><input type="hidden" class="date_slug" value="${date_slug}"><a href="#" class="change_date_pa">Change</a>`
 				html += `<a href="#" class="delete_date_pa"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></a>`
 				html += `</div></div>`
 
@@ -187,6 +187,18 @@
 
 	$('.personal_account_dates_wrapper .delete_date_pa').on('click', function() {
 		$(this).parent().parent().remove()
+
+		let user_id = $('#current_user_id').val()
+		let date_slug = $(this).siblings('.date_slug').val()
+		const data = {
+			action: 'remove_date',
+			user_id: user_id,
+			date_slug: date_slug
+		};
+
+		$.post( '/wp-admin/admin-ajax.php', data, function( response ){
+			// console.log(response);
+		} );
 	})
 	
 

@@ -60,8 +60,8 @@ class Woocommerce_Loyalty_Program_Public {
 		add_action( 'wp_ajax_add_new_date', 'ajax_add_new_date' ); 
 		add_action( 'wp_ajax_nopriv_add_new_date', 'ajax_add_new_date' );
 
-		add_action( 'wp_ajax_remove_date', 'ajax_remove_date' ); 
-		add_action( 'wp_ajax_nopriv_remove_date', 'ajax_remove_date' );
+		add_action( 'wp_ajax_remove_date', [ $this, 'ajax_remove_date'] ); 
+		add_action( 'wp_ajax_nopriv_remove_date', [ $this, 'ajax_remove_date'] );
 
 		add_action( 'wp_ajax_change_date', 'ajax_change_date' ); 
 		add_action( 'wp_ajax_nopriv_change_date', 'ajax_change_date' );
@@ -198,22 +198,6 @@ class Woocommerce_Loyalty_Program_Public {
 				</div>
 			</div>
 		<?php
-	
-		// foreach($posts as $post) {
-		// 	$field_name = $post->post_name;
-		// 	$field_label = $post->post_title;
-		// 	$field_id =  $post->post_name;
-		// 	$field_required = false; // Можете изменить на false, если поле не обязательное
-	
-		// 	woocommerce_form_field( $field_name, array(
-		// 		'type' => 'date',
-		// 		'class' => array( 'form-row-wide datePicker_wrapper' ),
-		// 		'label' => $field_label,
-		// 		'required' => $field_required,
-		// 		'id' => $field_id,
-		// 	) );
-			
-		// }
 	}
 
 	public function save_gate_fields_on_registration( $customer_id ) {
@@ -265,15 +249,17 @@ class Woocommerce_Loyalty_Program_Public {
 				$date_arr = explode('||', $value);
 				$date_celeb = $date_arr[1];
 	
-				update_user_meta( $customer_id, 'test_name_date' . $key, $date_arr[0] );
-				update_user_meta( $customer_id, 'test_date_date' . $key, $date_arr[1] );
+				// update_user_meta( $customer_id, 'test_name_date' . $key, $date_arr[0] );
+				// update_user_meta( $customer_id, 'test_date_date' . $key, $date_arr[1] );
+
+				update_user_meta( $customer_id, $date_arr[0] . '_date', $date_arr[1] );
 				
 				if(!empty($date_arr[2])) {
-					update_user_meta( $customer_id, 'test_date_custom_name' . $key, $date_arr[2] );
+					update_user_meta( $customer_id, $date_arr[0] . '_custom_name', $date_arr[2] );
 				}
 				
 	
-				update_user_meta( $customer_id, 'test_name_celebrate' . $key, $name_celebrate );
+				update_user_meta( $customer_id, $date_arr[0] . '_name_celebrate', $name_celebrate );
 				
 				$coupon = array(
 					'post_title' => $coupon_code,
@@ -285,8 +271,8 @@ class Woocommerce_Loyalty_Program_Public {
 				$date_exp = strtotime($date_celeb . "+1 days");
 				$date_start = strtotime($date_celeb . "-6 days");
 	
-				update_user_meta( $customer_id, '_date_exp_' . $date_arr[0], $date_exp );
-				update_user_meta( $customer_id, '_date_strt_'  . $date_arr[0], $date_start );
+				update_user_meta( $customer_id, '_date_coupon_exp_' . $date_arr[0], $date_exp );
+				update_user_meta( $customer_id, '_date_coupon_strt_'  . $date_arr[0], $date_start );
 	
 				$args = array(
 					'name'        => $date_arr[0],
@@ -296,7 +282,7 @@ class Woocommerce_Loyalty_Program_Public {
 				);
 	
 				$current_celebrate = get_posts($args);
-				update_user_meta( $customer_id, 'test_test' . $key, json_encode($current_celebrate) );
+				update_user_meta( $customer_id, $date_arr[0] . '_test', json_encode($current_celebrate) );
 	
 	
 				$date_for_sendpulse_array = explode('.', $date_arr[1]);
@@ -380,34 +366,34 @@ class Woocommerce_Loyalty_Program_Public {
 			'posts_per_page' => -1,
 		) );
 		?>
+		<input type="hidden" id="current_user_id" value="<?php echo $user_id; ?>">
 		<div class="personal_account_dates_wrapper">
 			<?php
-				for($i=0; $i <=100;  $i++) {
-					if (get_user_meta($user_id, 'test_date_date' . $i, true)) {
-						$name_celeb = get_user_meta($user_id, 'test_name_celebrate' . $i, true);
-						$generated_slug = get_user_meta($user_id, 'test_name_date' . $i, true);
-						$pattern = '/\s+/';
-						$name_clean = preg_replace($pattern, '', $name_celeb);
-						// $generated_slug .= $name_clean;
-					?>
-						<div class="item <?php echo $generated_slug; ?>">
-							<div class="name"><?php echo $name_celeb; ?></div>
-							<div class="date">
-								<?php
-									$date = get_user_meta($user_id, 'test_date_date' . $i, true);
-									$celeb_date = strtotime($date);
-									$newformat_date = date("j, F", $celeb_date);
-									echo $newformat_date;
-								?>
+				foreach($posts as $post_date) {
+					$field_name = $post_date->post_name;
+					// 	$field_label = $post->post_title;
+					// 	$field_id =  $post->post_name;
+
+					if(get_user_meta($user_id, $field_name . '_date', true)) {
+						$name_celeb = get_user_meta($user_id, $field_name . '_name_celebrate', true);
+						?>
+							<div class="item <?php echo $field_name; ?>">
+								<div class="name"><?php echo $name_celeb; ?></div>
+								<div class="date">
+									<?php
+										$date = get_user_meta($user_id, $field_name . '_date', true);
+										$celeb_date = strtotime($date);
+										$newformat_date = date("j, F", $celeb_date);
+										echo $newformat_date;
+									?>
+								</div>
+								<div class="change-delete">
+									<input type="hidden" class="date_slug" value="<?php echo $field_name; ?>">
+									<a href="#" class="change_date_pa">Change</a>
+									<a href="#" class="delete_date_pa"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></a>
+								</div>
 							</div>
-							<div class="change-delete">
-								<a href="#" class="change_date_pa">Change</a>
-								<a href="#" class="delete_date_pa"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></a>
-							</div>
-						</div>
 					<?php
-					} else {
-						break;
 					}
 				}
 			?>
@@ -476,7 +462,24 @@ class Woocommerce_Loyalty_Program_Public {
 	}
 
 	public function ajax_remove_date() {
+		$user_id = intval( $_POST['user_id'] );
+		$date_slug = $_POST['date_slug'];
+		$coupon_code = get_user_meta($user_id, 'coupon_for_' . $date_slug, true);
+		$coupon_id = wc_get_coupon_id_by_code( $coupon_code);
+		wp_trash_post($coupon_id);
 		
+		delete_user_meta($user_id, 'coupon_for_' . $date_slug);
+		delete_user_meta($user_id, $date_slug . '_date');
+		delete_user_meta($user_id, $date_slug . '_test');
+		delete_user_meta($user_id, $date_slug . '_name_celebrate');
+		delete_user_meta($user_id, $date_slug . '_custom_name');
+
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
+		$sendPulse = new SendPulseApi;
+		$sendPulse->add_new_and_change_address($data_array, $customer_id);
+
+		wp_die();
 	}
 
 	public function ajax_change_date() {
