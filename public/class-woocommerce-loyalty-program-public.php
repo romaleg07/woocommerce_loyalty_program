@@ -228,21 +228,25 @@ class Woocommerce_Loyalty_Program_Public {
 
 		$customer_data = get_userdata( $customer_id );
 		$customer_email = $customer_data->user_email;
-		$customer_phone = get_usermeta($customer_id, 'billing_phone', true);
-		$first_name = get_usermeta($customer_id, 'first_name', true);
-		$last_name = get_usermeta($customer_id, 'last_name', true);
-		$name = trim($first_name . ' ' . $last_name);
+
+		// $customer_phone = get_usermeta($customer_id, 'billing_phone', true);
+		// $first_name = get_usermeta($customer_id, 'first_name', true);
+		// $last_name = get_usermeta($customer_id, 'last_name', true);
+		// $name = trim($first_name . ' ' . $last_name);
 
 		$data_array = array("email" => $customer_email);
 		$data_array['variables'] = array();
 
 		$data_array['variables']['language'] = get_locale();
 
-		if(!empty($customer_phone)){
-			$data_array['variables']['Phone'] = $customer_phone;
+		if(isset($_POST['billing_phone'])){
+			$data_array['variables']['Phone'] = sanitize_text_field($_POST['billing_phone']);
 		}
-		if(!empty($name)){
-			$data_array['variables']['Имя'] = $name;
+		if(isset($_POST['billing_first_name'])){
+			$data_array['variables']['name'] = sanitize_text_field($_POST['billing_first_name']);
+		}
+		if(isset($_POST['billing_last_name'])){
+			$data_array['variables']['last_name'] = sanitize_text_field($_POST['billing_last_name']);
 		}
 
 		if (isset($_POST['notify_dates']) and !empty($_POST['notify_dates']) ) {
@@ -301,6 +305,10 @@ class Woocommerce_Loyalty_Program_Public {
 	
 				if($name_celebrate != '- -') {
 					$data_array['variables']['name_'.$date_arr[0]] = $name_celebrate;
+				}
+
+				if(!empty($date_arr[2])) {
+					$data_array['variables']['custom_name_'.$date_arr[0]] = $date_arr[2];
 				}
 	
 				if( $current_celebrate ) {
