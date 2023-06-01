@@ -33,12 +33,15 @@
 	$('.datePicker_wrapper  input').datepicker();
 
 	$('.notification_dates-item').on('click', function(e) {
-		const input = $(this).find('.input-date_with_datepicker')
+		const input = $(this).find('.input-text')
 
 		if(!input.is(e.target)) {
 			const checkbox = $(this).find('input[type="checkbox"]')
 			checkbox.prop("checked", !checkbox.prop("checked"));
 			$(this).toggleClass('checked')
+			if ($(this).hasClass('personal-date')) {
+				$(this).find('.date-name-wrapper').slideToggle()
+			}
 		}
 		
 	})
@@ -56,7 +59,8 @@
 		date_arr['name'] = name_date
 		date_arr['last_name'] = last_name_date
 
-		$('.notification_dates-item').each(function() {
+		let len_items = $('.notification_dates-item').length
+		$('.notification_dates-item').each(function(index) {
 			if($(this).find('input[type="checkbox"]').is(':checked')) {
 				date = $(this).find('.input-date_with_datepicker').val()
 				date_slug = $(this).find('input[type="checkbox"]').val()
@@ -75,23 +79,31 @@
 				if($(`.${date_slug}`).length) {
 					$(`.${date_slug}`).remove()
 				}
+				
+				let custom_date_name = ''
+				if ($(this).hasClass('personal-date')) {
+					custom_date_name = $(this).find('.date-name-wrapper input').val()
+				}
 
-				let html = `<div class="item_added_dates ${date_slug}"><span class="name">${name_date} ${last_name_date}</span><span class="date">${visible_date}</span><input type="hidden" value="${date_slug}||${date}" name="notify_dates[]"><input type="hidden" name="notify_dates_name[]" value="${name_date} ${last_name_date}"><span class="delete"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></div>`
+				let html = `<div class="item_added_dates ${date_slug}"><span class="name">${name_date} ${last_name_date}</span><span class="date">${visible_date}</span><input type="hidden" value="${date_slug}||${date}||${custom_date_name}" name="notify_dates[]"><input type="hidden" name="notify_dates_name[]" value="${name_date} ${last_name_date}"><span class="delete"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></div>`
 				button.before(html)
-				$('#add_notification_dates').magnificPopup('close')
 			} else {
 				$(this).find('.input-date_with_datepicker').removeClass('empty')
 			}
-			
-		})
 
-		$('#add_notification_dates input').each(function() {
-			if($(this).attr('type') == 'checkbox') {
-				$(this).removeAttr("checked");
-				$(this).parent().removeClass('checked')
-			} else if($(this).attr('type') == 'text') {
-				$(this).val('')
+			if(index === (len_items - 1)) {
+				$('#add_notification_dates').magnificPopup('close')
+				$('.personal-date .date-name-wrapper').slideUp()
+				$('#add_notification_dates input').each(function() {
+					if($(this).attr('type') == 'checkbox') {
+						$(this).removeAttr("checked");
+						$(this).parent().removeClass('checked')
+					} else if($(this).attr('type') == 'text') {
+						$(this).val('')
+					}
+				})
 			}
+			
 		})
 
 		$('.item_added_dates .delete').on('click', function() {
@@ -143,6 +155,7 @@
 				}
 
 				$('#add_notification_dates').magnificPopup('close')
+				$('.personal-date .date-name-wrapper').slideUp()
 				$('#add_notification_dates input').each(function() {
 					if($(this).attr('type') == 'checkbox') {
 						$(this).removeAttr("checked");

@@ -160,6 +160,7 @@ class Woocommerce_Loyalty_Program_Public {
 									foreach($posts as $date): 
 									$id = $date->ID;
 									$celeb_date = get_post_meta($id, '_date_discount', true);
+									$is_personal_date = get_post_meta($id, '_is_personal_date', true);
 									if(!empty($celeb_date)) {
 										$celeb_date = strtotime($celeb_date);
 										$newformat_date = date("j, F", $celeb_date);
@@ -167,7 +168,7 @@ class Woocommerce_Loyalty_Program_Public {
 									}
 									
 								?>
-									<div class="notification_dates-item">
+									<div class="notification_dates-item <?php if($is_personal_date) echo 'personal-date';?>">
 										<input type="checkbox" name="date_notify" value="<?php echo $date->post_name; ?>">
 										<span><?php echo $date->post_title; ?></span>
 										<?php if(!empty($celeb_date)): ?>
@@ -179,6 +180,12 @@ class Woocommerce_Loyalty_Program_Public {
 										<div class="date-wrapper datePicker_wrapper chose_date">
 											<input type="text" class="woocommerce-Input woocommerce-Input--text input-date_with_datepicker input-text" placeholder="<?php echo __( 'Choose date', 'woocommerce-loyalty-program' );?>" name="chosen_date_<?php echo $date->post_name; ?>" id="chosen_date_<?php echo $date->post_name; ?>" autocomplete="off">
 										</div>
+										<?php endif; ?>
+
+										<?php if($is_personal_date):?>
+											<div class="date-name-wrapper">
+												<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" placeholder="<?php echo __( 'Enter a name', 'woocommerce-loyalty-program' );?>" name="custom_name_<?php echo $date->post_name; ?>" id="custom_name_<?php echo $date->post_name; ?>" autocomplete="off">
+											</div>
 										<?php endif; ?>
 										
 									</div>
@@ -242,6 +249,7 @@ class Woocommerce_Loyalty_Program_Public {
 			$notify_dates = $_POST['notify_dates'];
 			$notify_dates_names = $_POST['notify_dates_name'];
 
+
 			foreach($notify_dates as $key => $value) {
 				$name_celebrate = $notify_dates_names[$key];
 				$all_string = $name_celebrate . $value;
@@ -255,6 +263,11 @@ class Woocommerce_Loyalty_Program_Public {
 	
 				update_user_meta( $customer_id, 'test_name_date' . $key, $date_arr[0] );
 				update_user_meta( $customer_id, 'test_date_date' . $key, $date_arr[1] );
+				
+				if(!empty($date_arr[2])) {
+					update_user_meta( $customer_id, 'test_date_custom_name' . $key, $date_arr[2] );
+				}
+				
 	
 				update_user_meta( $customer_id, 'test_name_celebrate' . $key, $name_celebrate );
 				

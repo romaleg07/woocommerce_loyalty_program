@@ -99,7 +99,13 @@ function render_discount_amount_field_meta_box( $post ) {
     $discount_amount_field_value = get_post_meta( $post->ID, 'discount_amount_key', true );
 	$id_email_notif = get_post_meta( $post->ID, '_id_email_sendpulse', true );
 	$date_discount = get_post_meta( $post->ID, '_date_discount', true );
+	$is_personal_date = get_post_meta( $post->ID, '_is_personal_date', true );
     ?>
+	<p class="form-row form-checkbox">
+		<label>
+			<input type="checkbox" class="checkbox" name="is_personal_date" <?php if($is_personal_date) echo 'checked'; ?> id="is_personal_date"> <span>Is Personal date</span>
+		</label>
+	</p>
 	<p class="form-field _add_discount">
 		<label for="discount_amount"><?php echo __('Discount amount (%):', 'woocommerce-loyalty-program');?></label>
 		<input type="text" id="discount_amount" name="discount_amount" value="<?php echo esc_attr( $discount_amount_field_value ); ?>">
@@ -133,6 +139,12 @@ function save_discount_amount_field( $post_id ) {
         $id_email_sendpulse = sanitize_text_field( $_POST['_id_email_sendpulse'] );
         update_post_meta( $post_id, '_id_email_sendpulse', $id_email_sendpulse );
     }
+
+	if ( isset( $_POST['is_personal_date'] ) ) {
+        update_post_meta( $post_id, '_is_personal_date', true );
+    } else {
+		update_post_meta( $post_id, '_is_personal_date', false );
+	}
 }
 add_action( 'save_post', 'save_discount_amount_field' );
 
