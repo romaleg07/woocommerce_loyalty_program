@@ -57,14 +57,14 @@ class Woocommerce_Loyalty_Program_Public {
 		add_action( 'init', [ $this, 'memorable_dates_add_endpoint'], 25 );
 		add_action( 'woocommerce_account_memorable-dates_endpoint', [ $this, 'memorable_dates_content'], 25 );
 
-		add_action( 'wp_ajax_add_new_date', 'ajax_add_new_date' ); 
-		add_action( 'wp_ajax_nopriv_add_new_date', 'ajax_add_new_date' );
+		add_action( 'wp_ajax_add_new_date', [ $this, 'ajax_add_new_date'] ); 
+		add_action( 'wp_ajax_nopriv_add_new_date', [ $this, 'ajax_add_new_date'] );
 
 		add_action( 'wp_ajax_remove_date', [ $this, 'ajax_remove_date'] ); 
 		add_action( 'wp_ajax_nopriv_remove_date', [ $this, 'ajax_remove_date'] );
 
-		add_action( 'wp_ajax_change_date', 'ajax_change_date' ); 
-		add_action( 'wp_ajax_nopriv_change_date', 'ajax_change_date' );
+		add_action( 'wp_ajax_change_date', [ $this, 'ajax_change_date'] ); 
+		add_action( 'wp_ajax_nopriv_change_date', [ $this, 'ajax_change_date'] );
 	}
 
 	/**
@@ -201,8 +201,8 @@ class Woocommerce_Loyalty_Program_Public {
 	}
 
 	public function save_gate_fields_on_registration( $customer_id ) {
-		$test = json_encode($_POST);
-		update_user_meta( $customer_id, 'test', $test );
+		// $test = json_encode($_POST);
+		// update_user_meta( $customer_id, 'test', $test );
 		
 		$notification_flag = false;
 		if(isset($_POST[ 'notification_flag' ])) {
@@ -424,6 +424,7 @@ class Woocommerce_Loyalty_Program_Public {
 								foreach($posts as $date): 
 								$id = $date->ID;
 								$celeb_date = get_post_meta($id, '_date_discount', true);
+								$is_personal_date = get_post_meta($id, '_is_personal_date', true);
 								if(!empty($celeb_date)) {
 									$celeb_date = strtotime($celeb_date);
 									$newformat_date = date("j, F", $celeb_date);
@@ -431,7 +432,7 @@ class Woocommerce_Loyalty_Program_Public {
 								}
 								
 							?>
-								<div class="notification_dates-item">
+								<div class="notification_dates-item <?php if($is_personal_date) echo 'personal-date';?>">
 									<input type="checkbox" name="date_notify" value="<?php echo $date->post_name; ?>">
 									<span><?php echo $date->post_title; ?></span>
 									<?php if(!empty($celeb_date)): ?>
@@ -443,6 +444,12 @@ class Woocommerce_Loyalty_Program_Public {
 									<div class="date-wrapper datePicker_wrapper chose_date">
 										<input type="text" class="woocommerce-Input woocommerce-Input--text input-date_with_datepicker input-text" placeholder="<?php echo __( 'Choose date', 'woocommerce-loyalty-program' );?>" name="chosen_date_<?php echo $date->post_name; ?>" id="chosen_date_<?php echo $date->post_name; ?>" autocomplete="off">
 									</div>
+									<?php endif; ?>
+
+									<?php if($is_personal_date):?>
+										<div class="date-name-wrapper">
+											<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" placeholder="<?php echo __( 'Enter a name', 'woocommerce-loyalty-program' );?>" name="custom_name_<?php echo $date->post_name; ?>" id="custom_name_<?php echo $date->post_name; ?>" autocomplete="off">
+										</div>
 									<?php endif; ?>
 									
 								</div>
@@ -458,7 +465,32 @@ class Woocommerce_Loyalty_Program_Public {
 	}
 
 	public function ajax_add_new_date() {
+		$user_id = intval( $_POST['user_id'] );
+		$customer_data = get_userdata( $user_id );
+		$customer_email = $customer_data->user_email;
+		$clean_data_array = $_POST;
+		unset($clean_data_array['name']);
+		unset($clean_data_array['last_name']);
+		unset($clean_data_array['user_id']);
+		unset($clean_data_array['action']);
+		
 
+		$data_array = array("email" => $customer_email);
+		$data_array['variables'] = array();
+
+		$data_array['variables']['name'] = sanitize_text_field($_POST['name']);
+		$data_array['variables']['last_name'] = sanitize_text_field($_POST['last_name']);
+
+
+		foreach($clean_data_array as $key => $value) {
+			$data_array['variables'][$key] = $value;
+		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
+		$sendPulse = new SendPulseApi;
+		$sendPulse->add_new_and_change_address($data_array, $user_id);
+
+		wp_die();
 	}
 
 	public function ajax_remove_date() {
@@ -499,7 +531,7 @@ class Woocommerce_Loyalty_Program_Public {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
 		$sendPulse = new SendPulseApi;
-		echo $sendPulse->delete_address($data_array, $user_id);
+		$sendPulse->delete_address($data_array, $user_id);
 
 		wp_die();
 	}

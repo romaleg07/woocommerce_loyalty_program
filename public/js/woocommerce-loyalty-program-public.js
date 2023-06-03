@@ -112,7 +112,7 @@
 
 		return false;
 	})
-
+	
 	$('#add_new_date_notification_pk').on('click', function() {
 		let date_arr = {}
 		const name_date = $('#add_date_new_firs_name').val() || '-'
@@ -120,13 +120,14 @@
 		const button = $('a[href="#add_notification_dates"]')
 		let date
 		let date_slug
-
+		let user_id = $('#current_user_id').val();
 
 		date_arr['name'] = name_date
 		date_arr['last_name'] = last_name_date
+		date_arr['user_id'] = user_id
 
-		
-		$('.notification_dates-item').each(function() {
+		let len_items = $('.notification_dates-item').length
+		$('.notification_dates-item').each(function(index) {
 			if($(this).find('input[type="checkbox"]').is(':checked')) {
 				date = $(this).find('.input-date_with_datepicker').val()
 				date_slug = $(this).find('input[type="checkbox"]').val()
@@ -134,7 +135,8 @@
 					$(this).find('.input-date_with_datepicker').addClass('empty')
 					return false
 				} else {
-					date_arr[date_slug] = date
+					let api_date = date.split('.')
+					date_arr[date_slug] = `${api_date[2]}-${api_date[1]}-${api_date[0]}`
 				}
 
 				let visible_date = date.split('.')
@@ -154,6 +156,17 @@
 					button.before(html)
 				}
 
+				let custom_date_name = ''
+				if ($(this).hasClass('personal-date')) {
+					date_arr[`custom_name_${date_slug}`] = $(this).find('.date-name-wrapper input').val()
+				}
+
+			} else {
+				$(this).find('.input-date_with_datepicker').removeClass('empty')
+
+			}
+
+			if(index === (len_items - 1)) {
 				$('#add_notification_dates').magnificPopup('close')
 				$('.personal-date .date-name-wrapper').slideUp()
 				$('#add_notification_dates input').each(function() {
@@ -164,23 +177,18 @@
 						$(this).val('')
 					}
 				})
-
-				let user_id = $('#user_id').val();
-
-				$.ajax({
-					url: '/wp-admin/admin-ajax.php',
-					type: 'POST',
-					data: `user_id=${user_id}&param1=2&param2=3`,
-					success: function( data ) {
-						console.log(data);
-					}
-				});
-
-			} else {
-				$(this).find('.input-date_with_datepicker').removeClass('empty')
 			}
 			
 		})
+		
+		// измеряем длинну массива, чтобы узнать было ли что-то вырано
+		if(Object.keys(date_arr).length > 3) {
+			date_arr['action'] = 'add_new_date';
+			console.log(date_arr);
+			$.post( '/wp-admin/admin-ajax.php', date_arr, function( response ){
+				console.log(response);
+			} );
+		}
 
 		return false;
 	})
