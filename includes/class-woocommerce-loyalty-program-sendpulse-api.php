@@ -129,6 +129,47 @@ class SendPulseApi {
 		}
 	}
 
+	public function delete_address($address_data, $user_id) {
+		$json_data = json_encode($address_data);
+
+		$this->logger->debug( $json_data, array( 'source' => 'Woocommerce_Loyalty_Program' ) );
+
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => $this->url . '/addressbooks/' . $this->id_address_book . '/emails/variable',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => $json_data,
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/json',
+			'Authorization: Bearer ' . $this->bearer_token
+		),
+		));
+
+		$response = curl_exec($curl);
+
+		$this->logger->debug( $response, array( 'source' => 'Woocommerce_Loyalty_Program' ) );
+
+		update_post_meta($user_id, '_response_from_sendpulse', $response);
+
+		curl_close($curl);
+
+		$response_array = json_decode($response, true);
+
+		if(isset($response_array['result']) and $response_array['result']){ 
+			return $response_array['result'];
+		} else {
+			$this->logger->error( $response, array( 'source' => 'Woocommerce_Loyalty_Program' ) );
+			return false;
+		}
+	}
+
 	public function add_new_webhook($callback_address) {
 		$curl = curl_init();
 

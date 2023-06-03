@@ -467,17 +467,39 @@ class Woocommerce_Loyalty_Program_Public {
 		$coupon_code = get_user_meta($user_id, 'coupon_for_' . $date_slug, true);
 		$coupon_id = wc_get_coupon_id_by_code( $coupon_code);
 		wp_trash_post($coupon_id);
-		
+
+
+		$customer_data = get_userdata( $user_id );
+		$customer_email = $customer_data->user_email;
+		$data_array = array("email" => $customer_email);
+		$data_array['variables'] = array();
+
+		$data_array['variables'][0]['name'] = 'name_' . $date_slug;
+		$data_array['variables'][0]['value'] = '';
+
+		$data_array['variables'][1]['name'] = 'coupon_' . $date_slug;
+		$data_array['variables'][1]['value'] = '';
+
+		if(get_user_meta($user_id, $date_slug . '_custom_name', true)) {
+			$data_array['variables'][2]['name'] = 'custom_name_' . $date_slug;
+			$data_array['variables'][2]['value'] = '';
+		}
+
+		$data_array['variables'][3]['name'] = $date_slug;
+		$data_array['variables'][3]['value'] = '0000-01-01';
+
 		delete_user_meta($user_id, 'coupon_for_' . $date_slug);
 		delete_user_meta($user_id, $date_slug . '_date');
 		delete_user_meta($user_id, $date_slug . '_test');
 		delete_user_meta($user_id, $date_slug . '_name_celebrate');
 		delete_user_meta($user_id, $date_slug . '_custom_name');
 
+		echo json_encode($data_array);
+
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
 		$sendPulse = new SendPulseApi;
-		$sendPulse->add_new_and_change_address($data_array, $customer_id);
+		echo $sendPulse->delete_address($data_array, $user_id);
 
 		wp_die();
 	}
