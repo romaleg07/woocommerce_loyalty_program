@@ -136,7 +136,7 @@
 					return false
 				} else {
 					let api_date = date.split('.')
-					date_arr[date_slug] = `${api_date[2]}-${api_date[1]}-${api_date[0]}`
+					date_arr[`datesend_${date_slug}`] = `${api_date[2]}-${api_date[1]}-${api_date[0]}`
 				}
 
 				let visible_date = date.split('.')
@@ -193,7 +193,7 @@
 		return false;
 	})
 
-	$('.personal_account_dates_wrapper .delete_date_pa').on('click', function() {
+	$(document).on('click', '.personal_account_dates_wrapper .delete_date_pa', function(){
 		$(this).parent().parent().remove()
 
 		let user_id = $('#current_user_id').val()
