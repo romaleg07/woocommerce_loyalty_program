@@ -65,6 +65,9 @@ class Woocommerce_Loyalty_Program_Public {
 
 		add_action( 'wp_ajax_change_date', [ $this, 'ajax_change_date'] ); 
 		add_action( 'wp_ajax_nopriv_change_date', [ $this, 'ajax_change_date'] );
+
+		// add_action('woocommerce_new_order', [ $this, 'count_used_coupons']);
+
 	}
 
 	/**
@@ -527,8 +530,8 @@ class Woocommerce_Loyalty_Program_Public {
 				update_user_meta( $customer_id, 'coupon_for_' . $name_celebrate, $coupon_code );
 
 				
-				if(get_post_meta($customer_id, '_coupons_count', true)) {
-					$coupon_count = get_post_meta($customer_id, '_coupons_count', true);
+				if(get_user_meta($customer_id, '_coupons_count', true)) {
+					$coupon_count = get_user_meta($customer_id, '_coupons_count', true);
 				} else {
 					$coupon_count = 0;
 				}
@@ -550,7 +553,6 @@ class Woocommerce_Loyalty_Program_Public {
 			update_user_meta( $customer_id, '_coupon_error', 'celebration date notfound' . $date_arr[0] );
 		}
 	}
-
 
 	public function ajax_add_new_date() {
 		$user_id = intval( $_POST['user_id'] );
@@ -580,6 +582,7 @@ class Woocommerce_Loyalty_Program_Public {
 					$old_promocode = get_user_meta($user_id, 'coupon_for_' . $clean_name_date, true);
 					$coupon_id = wc_get_coupon_id_by_code( $old_promocode);
 					wp_trash_post($coupon_id);
+					
 					$promocode = $this->generate_promocode($clean_name_date, $value, $user_id, true);
 				} else {
 					$promocode = $this->generate_promocode($clean_name_date, $value, $user_id, false);
@@ -653,7 +656,7 @@ class Woocommerce_Loyalty_Program_Public {
 
 		echo json_encode($data_array);
 
-		$coupon_count = get_post_meta($user_id, '_coupons_count', true);
+		$coupon_count = get_user_meta($user_id, '_coupons_count', true);
 		$coupon_count--;
 		update_user_meta( $user_id, '_coupons_count', $coupon_count );
 
@@ -668,5 +671,23 @@ class Woocommerce_Loyalty_Program_Public {
 	public function ajax_change_date() {
 		
 	}
+
+
+	// public function count_used_coupons($order_id) {
+	// 	$order = wc_get_order($order_id);
+	
+	// 	$used_coupons = $order->get_used_coupons();
+	
+	// 	if (!empty($used_coupons)) {
+	// 		$user_id = $order->get_user_id();
+	// 		if(get_user_meta($user_id, '_count_activate_coupons', true)) {
+	// 			$coupons_count = get_user_meta($user_id, '_count_activate_coupons', true);
+	// 			$coupons_count++;
+	// 			update_user_meta($user_id, '_count_activate_coupons', $coupons_count);
+	// 		} else {
+	// 			update_user_meta($user_id, '_count_activate_coupons', 1);
+	// 		}
+	// 	}
+	// }
 
 }

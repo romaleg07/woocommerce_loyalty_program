@@ -31,33 +31,114 @@
 	$('.addDatepicker').datepicker({ dateFormat: 'dd/mm/yy' });
 
 	if($('.statistic-wrapper').length) {
+		get_users_with_cupons(1);
+		get_registered_users_count('all');
+		get_registered_users_count_period('all');
+		get_activated_coupons_count('all');
+		get_coupon_count('all');
+
+		// const data = {
+		// 	action: 'get_statistics',
+		// };
+
+		// jQuery.post( '/wp-admin/admin-ajax.php', data, function( response ){
+		// 	console.log(response);
+
+		// 	$('.statistic-wrapper').removeClass('loading');
+		// } );
+
+	}
+
+	$('.statistic-period').on('click', function() {
+		$('.statistic-wrapper').addClass('loading');
+		let period = $(this).data('period');
+		get_registered_users_count_period(period);
+		get_activated_coupons_count(period);
+		get_coupon_count(period);
+		return false;
+	})
+
+	$('#load_page').on('click', function() {
+		$('.statistic-wrapper').addClass('loading');
+		let page = $('#users_page_loyalty').val()
+		get_users_with_cupons(page);
+		return false;
+	})
+
+	function get_users_with_cupons($page) {
+
+		const data4 = {
+			action: 'get_users_with_coupons',
+			page: $page
+		};
+
+		jQuery.post( '/wp-admin/admin-ajax.php', data4, function( response ){
+			let html = '';
+			for (let user of response) {
+				html += `<tr>`
+				html += `<td><a href="/wp-admin/user-edit.php?user_id=${user.ID}" target="_blank">${user.data.first_name} ${user.data.last_name}(${user.data.user_email})</a></td>`
+				html += `<td>${user.data.all_coupons}</td>`
+				html += `<td>${user.data.used_coupons}</td>`
+				html += `</tr>`
+			}
+
+			$('#users-with-coupons tbody').html(html)
+			$('.statistic-wrapper').removeClass('loading');
+		} );
+	}
+
+	function get_registered_users_count($period) {
 		const data = {
-			action: 'get_statistics',
+			action: 'get_registered_users_count',
+			period: $period
 		};
 
 		jQuery.post( '/wp-admin/admin-ajax.php', data, function( response ){
-			console.log(response);
+			$('#all_users_count').html(response)
+			create_pagination(response)
+		} );
+	}
 
+	function get_registered_users_count_period($period) {
+		const data = {
+			action: 'get_registered_users_count',
+			period: $period
+		};
+
+		jQuery.post( '/wp-admin/admin-ajax.php', data, function( response ){
+			$('#all_users_count_new').html(response)
+		} );
+	}
+
+	function get_activated_coupons_count($period) {
+		const data = {
+			action: 'get_activated_coupons_count',
+			period: $period
+		};
+
+		jQuery.post( '/wp-admin/admin-ajax.php', data, function( response ){
+			$('#activated_coupons_count').html(response)
+		} );
+	}
+
+	function get_coupon_count($period) {
+		const data = {
+			action: 'get_coupon_count',
+			period: $period
+		};
+
+		jQuery.post( '/wp-admin/admin-ajax.php', data, function( response ){
+			$('#all_coupon_count').html(response)
 			$('.statistic-wrapper').removeClass('loading');
 		} );
+	}
 
-		const data2 = {
-			action: 'get_registered_users_count',
-		};
-
-		jQuery.post( '/wp-admin/admin-ajax.php', data2, function( response ){
-			console.log(response);
-		} );
-
-		const data3 = {
-			action: 'get_activated_coupons_count',
-		};
-
-		jQuery.post( '/wp-admin/admin-ajax.php', data3, function( response ){
-			console.log(response);
-		} );
-
-
+	function create_pagination(users) {
+		let x = users, y = 10;
+		let pages = Math.floor(x/y + 1)
+		$('#pages').html(pages)
+		$('#users_page_loyalty').attr('min', 1)
+		$('#users_page_loyalty').attr('max', pages)
 	}
  
 })( jQuery );

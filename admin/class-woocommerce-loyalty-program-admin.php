@@ -55,7 +55,8 @@ class Woocommerce_Loyalty_Program_Admin {
 		add_action( 'wp_ajax_get_statistics', [ $this, 'ajax_get_statistics'] ); 
 		add_action( 'wp_ajax_get_registered_users_count', [ $this, 'ajax_get_registered_users_count'] ); 
 		add_action( 'wp_ajax_get_activated_coupons_count', [ $this, 'ajax_get_activated_coupons_count'] ); 
-		
+		add_action( 'wp_ajax_get_users_with_coupons', [ $this, 'ajax_get_users_with_coupons'] ); 		
+		add_action( 'wp_ajax_get_coupon_count', [ $this, 'ajax_get_coupon_count'] );
 	}
 
 	/**
@@ -197,7 +198,13 @@ class Woocommerce_Loyalty_Program_Admin {
 	public function ajax_get_registered_users_count() {
 		$args = array(
 			'fields' => 'count',
-			'role__not_in' => array('administrator') // Исключаем администраторов, если нужно
+			'role__not_in' => array('administrator'), // Исключаем администраторов, если нужно
+			'meta_query' => array(
+				array(
+					'key' => '_coupons_count',
+					'compare' => 'EXISTS'
+				)
+			)
 		);
 
 		$period = 'all';
@@ -269,5 +276,106 @@ class Woocommerce_Loyalty_Program_Admin {
 	
 		wp_die();
 	}
+
+	public function ajax_get_users_with_coupons() {
+
+		$page = 1;
+		if(isset($_POST['page'])) {
+			$page = $_POST['page'];
+		}
+		$per_page = 10;
+
+		$args = array(
+			'meta_key' => '_coupons_count',
+			'orderby' => 'meta_value_num',
+			'order' => 'DESC',
+			'paged' => $page,
+			'posts_per_page' => $per_page,
+			'meta_query' => array(
+				array(
+					'key' => '_coupons_count',
+					'compare' => 'EXISTS'
+				)
+			)
+		);
+	
+		$user_query = new WP_User_Query($args);
+		$users = $user_query->get_results();
+
+
+		foreach($users as $user) {
+			$id = $user->data->ID;
+			
+			$coupones = get_posts( array(
+				'post_type' => 'shop_coupon',
+				'post_status' => 'publish',
+				'posts_per_page' => -1,
+				'meta_key'    => '_used_by',
+				'meta_value'  => $id,
+			) );
+			if(get_user_meta($id, '_coupons_count', true)) {
+				$user->data->all_coupons = get_user_meta($id, '_coupons_count', true);
+			} else {
+				$user->data->all_coupons = 0;
+			}
+
+			if(get_user_meta($id, 'first_name', true)) {
+				$user->data->first_name = get_user_meta($id, 'first_name', true);
+			} else {
+				$user->data->first_name = '';
+			}
+			if(get_user_meta($id, 'last_name', true)) {
+				$user->data->last_name = get_user_meta($id, 'last_name', true);
+			} else {
+				$user->data->last_name = '';
+			}
+
+			$user->data->used_coupons = count($coupones);
+		}
+	
+		wp_send_json($users);
+	
+		wp_die();
+	}
+
+	public function ajax_get_coupon_count() {
+		$period = 'all';
+		if(isset($_POST['period'])) {
+			$period = $_POST['period'];
+		}
+
+		global $wpdb;
+	
+		$where_clause = '';
+	
+		switch ($period) {
+			case 'month':
+				$where_clause = "AND DATE_ADD(post_date, INTERVAL 1 MONTH) >= NOW()";
+				break;
+			case 'week':
+				$where_clause = "AND DATE_ADD(post_date, INTERVAL 1 WEEK) >= NOW()";
+				break;
+			default:
+				break;
+		}
+	
+		$query = "
+			SELECT COUNT(ID)
+			FROM $wpdb->posts
+			INNER JOIN $wpdb->postmeta
+				ON ($wpdb->posts.ID = $wpdb->postmeta.post_id)
+			WHERE $wpdb->posts.post_type = 'shop_coupon'
+				AND $wpdb->postmeta.meta_key = '_coupon_from_loyalty_program'
+				AND $wpdb->postmeta.meta_value = 1
+				$where_clause
+		";
+	
+		$count = $wpdb->get_var($query);
+	
+		wp_send_json($count);
+	
+		wp_die();
+	}
+	
 	
 }

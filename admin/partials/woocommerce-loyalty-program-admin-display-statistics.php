@@ -30,9 +30,36 @@
                     <li><a href="#" class="statistic-period" data-period="week"><?php echo __( 'Week', 'woocommerce-loyalty-program' ); ?></a></li>
                 </ul>
             </div>
-            <div class="item"></div>
+            <div class="item">
+                <span><?php echo __( 'total users', 'woocommerce-loyalty-program' ); ?>: </span><span id="all_users_count"></span>
+            </div>
+            <div class="item">
+                <span><?php echo __( 'New users', 'woocommerce-loyalty-program' ); ?>: </span><span id="all_users_count_new"></span>
+            </div>
+            <div class="item">
+                <span><?php echo __( 'All coupons', 'woocommerce-loyalty-program' ); ?>: </span><span id="all_coupon_count"></span>
+            </div>
+            <div class="item">
+                <span><?php echo __( 'Activated coupons', 'woocommerce-loyalty-program' ); ?>: </span><span id="activated_coupons_count"></span>
+            </div>
         </div>
     </div>
-    <div class="body-statistic"></div>
+    <div class="body-statistic">
+        <div class="pagination">
+            <input type="number" id="users_page_loyalty" value="1">
+            <a href="#" id="load_page">Load</a>
+            <span><?php echo __( 'total pages', 'woocommerce-loyalty-program' ); ?>: <span id="pages">1</span></span>
+        </div>
+        <table id="users-with-coupons">
+            <thead>
+                <tr>
+                    <th><?php echo __( 'User', 'woocommerce-loyalty-program' ); ?></th>
+                    <th><?php echo __( 'Total Dates', 'woocommerce-loyalty-program' ); ?></th>
+                    <th><?php echo __( 'Number of activated promo codes', 'woocommerce-loyalty-program' ); ?></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
     <div class="bottom-statistic"></div>
 </div>
