@@ -24,3 +24,38 @@
 .settings-loyalty-wrapper .form-row-last input {
     width: calc(100% - 300px);
 }
+.statistic-wrapper .loader {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    display: none;
+}
+.statistic-wrapper .loader svg {
+    -webkit-animation: rotating 2s linear infinite;
+    -moz-animation: rotating 2s linear infinite;
+    -ms-animation: rotating 2s linear infinite;
+    -o-animation: rotating 2s linear infinite;
+    animation: rotating 2s linear infinite;
+}
+
+@-webkit-keyframes rotating /* Safari and Chrome */ {
+    from {
+      -webkit-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    to {
+      -webkit-transform: rotate(360deg);
+      -o-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+}
+
+
+.statistic-wrapper.loading > * {
+    display: none;
+}
+.statistic-wrapper.loading .loader {
+    display: flex;
+}

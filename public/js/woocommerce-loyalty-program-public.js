@@ -121,6 +121,7 @@
 		let date
 		let date_slug
 		let user_id = $('#current_user_id').val();
+		let count_repeats = 0
 
 		date_arr['name'] = name_date
 		date_arr['last_name'] = last_name_date
@@ -152,6 +153,7 @@
 
 				if($(`.${date_slug}`).length) {
 					$(`.${date_slug}`).replaceWith(html)
+					count_repeats++
 				} else {
 					button.before(html)
 				}
@@ -184,6 +186,7 @@
 		// измеряем длинну массива, чтобы узнать было ли что-то вырано
 		if(Object.keys(date_arr).length > 3) {
 			date_arr['action'] = 'add_new_date';
+			date_arr['repeats'] = count_repeats;
 			console.log(date_arr);
 			$.post( '/wp-admin/admin-ajax.php', date_arr, function( response ){
 				console.log(response);

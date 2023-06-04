@@ -30,4 +30,34 @@
 	 */
 	$('.addDatepicker').datepicker({ dateFormat: 'dd/mm/yy' });
 
+	if($('.statistic-wrapper').length) {
+		const data = {
+			action: 'get_statistics',
+		};
+
+		jQuery.post( '/wp-admin/admin-ajax.php', data, function( response ){
+			console.log(response);
+
+			$('.statistic-wrapper').removeClass('loading');
+		} );
+
+		const data2 = {
+			action: 'get_registered_users_count',
+		};
+
+		jQuery.post( '/wp-admin/admin-ajax.php', data2, function( response ){
+			console.log(response);
+		} );
+
+		const data3 = {
+			action: 'get_activated_coupons_count',
+		};
+
+		jQuery.post( '/wp-admin/admin-ajax.php', data3, function( response ){
+			console.log(response);
+		} );
+
+
+	}
+ 
 })( jQuery );

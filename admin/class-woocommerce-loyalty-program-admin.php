@@ -52,6 +52,10 @@ class Woocommerce_Loyalty_Program_Admin {
 		$this->woocommerce_loyalty_program = $woocommerce_loyalty_program;
 		$this->version = $version;
 
+		add_action( 'wp_ajax_get_statistics', [ $this, 'ajax_get_statistics'] ); 
+		add_action( 'wp_ajax_get_registered_users_count', [ $this, 'ajax_get_registered_users_count'] ); 
+		add_action( 'wp_ajax_get_activated_coupons_count', [ $this, 'ajax_get_activated_coupons_count'] ); 
+		
 	}
 
 	/**
@@ -167,4 +171,103 @@ class Woocommerce_Loyalty_Program_Admin {
 		require_once plugin_dir_path( __FILE__ ) . 'partials/woocommerce-loyalty-program-admin-display-statistics.php';
 	}
 
+	public function ajax_get_statistics() {
+		$page = 1;
+		if(isset($_POST['page'])) {
+			$page = $_POST['page'];
+		}
+		$data = array();
+
+		$coupones = get_posts( array(
+			'post_type' => 'shop_coupon',
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+			'meta_key'    => '_coupon_from_loyalty_program',
+			'meta_value'  => 1,
+		) );
+
+		$data['coupones'] = $coupones;
+		$data['count_users'] = count_users( $strategy );
+		wp_send_json($coupones);
+		// echo json_encode($posts);
+
+		wp_die();
+	}
+
+	public function ajax_get_registered_users_count() {
+		$args = array(
+			'fields' => 'count',
+			'role__not_in' => array('administrator') // Исключаем администраторов, если нужно
+		);
+
+		$period = 'all';
+		if(isset($_POST['period'])) {
+			$period = $_POST['period'];
+		}
+	
+		switch ($period) {
+			case 'month':
+				$args['date_query'] = array(
+					array(
+						'after' => '1 month ago'
+					)
+				);
+				break;
+			case 'week':
+				$args['date_query'] = array(
+					array(
+						'after' => '1 week ago'
+					)
+				);
+				break;
+			default:
+				break;
+		}
+	
+		$user_query = new WP_User_Query($args);
+		$count = $user_query->get_total();
+		wp_send_json($count);
+	
+		wp_die();
+	}
+
+	public function ajax_get_activated_coupons_count() {
+		global $wpdb;
+
+		$period = 'all';
+		if(isset($_POST['period'])) {
+			$period = $_POST['period'];
+		}
+	
+		$where_clause = '';
+	
+		switch ($period) {
+			case 'month':
+				$where_clause = "AND DATE_ADD(post_date, INTERVAL 1 MONTH) >= NOW()";
+				break;
+			case 'week':
+				$where_clause = "AND DATE_ADD(post_date, INTERVAL 1 WEEK) >= NOW()";
+				break;
+			default:
+				break;
+		}
+	
+		$query = "
+			SELECT COUNT(DISTINCT ID)
+			FROM $wpdb->posts
+			INNER JOIN $wpdb->postmeta
+				ON ($wpdb->posts.ID = $wpdb->postmeta.post_id)
+			WHERE $wpdb->posts.post_type = 'shop_coupon'
+				AND $wpdb->postmeta.meta_key = 'usage_count'
+				AND $wpdb->postmeta.meta_value > 0
+				$where_clause
+		";
+	
+		$count = $wpdb->get_var($query);
+	
+		wp_send_json($count);
+	
+		wp_die();
+	}
+	
 }

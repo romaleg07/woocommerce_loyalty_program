@@ -221,6 +221,8 @@ class Woocommerce_Loyalty_Program_Public {
 		$data_array = array("email" => $customer_email);
 		$data_array['variables'] = array();
 
+		$coupon_count = 0;
+
 		$data_array['variables']['language'] = get_locale();
 
 		if(isset($_POST['billing_phone'])){
@@ -240,11 +242,11 @@ class Woocommerce_Loyalty_Program_Public {
 
 			foreach($notify_dates as $key => $value) {
 				$name_celebrate = $notify_dates_names[$key];
-				$all_string = $name_celebrate . $value;
+				$all_string = $customer_id . $name_celebrate . $value;
 				$key_hash = substr(sha1($all_string), 0, 10);
 				// update_user_meta( $customer_id, 'test_key_hash' . $key_hash,  );
 				$discount_type = 'percent';
-				$coupon_code = 'DT' . $customer_id . 'EE' . strtolower($key_hash);
+				$coupon_code = 'DT' . $customer_id . 'EE' . strtoupper($key_hash);
 	
 				$date_arr = explode('||', $value);
 				$date_celeb = $date_arr[1];
@@ -322,10 +324,12 @@ class Woocommerce_Loyalty_Program_Public {
 						update_post_meta( $new_coupon_id, '_wt_coupon_start_date', date('Y-m-d', $date_start) );
 		
 						update_post_meta( $new_coupon_id, '_user_id', $customer_id );
+						update_post_meta( $new_coupon_id, '_coupon_from_loyalty_program', true );
 	
 						update_user_meta( $customer_id, 'coupon_for_' . $date_arr[0], $coupon_code );
 						
 						$data_array['variables']['coupon_' . $date_arr[0]] = $coupon_code;
+						$coupon_count++;
 					} else {
 					
 						update_user_meta( $customer_id, '_coupon_error', 'create error' );
@@ -338,6 +342,8 @@ class Woocommerce_Loyalty_Program_Public {
 				}
 	
 			}
+
+			update_user_meta( $customer_id, '_coupons_count', $coupon_count );
 	
 			if($notification_flag) {
 				require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
@@ -464,11 +470,12 @@ class Woocommerce_Loyalty_Program_Public {
 	<?php
 	}
 
-	public function generate_promocode($name_celebrate, $date, $customer_id) {
-		$all_string = $name_celebrate . $date;
+	public function generate_promocode($name_celebrate, $date, $customer_id, $is_replace_promo) {
+
+		$all_string = $customer_id . $name_celebrate . $date;
 		$key_hash = substr(sha1($all_string), 0, 10);
 		$discount_type = 'percent';
-		$coupon_code = 'DT' . $customer_id . 'EE' . strtolower($key_hash);
+		$coupon_code = 'DT' . $customer_id . 'EE' . strtoupper($key_hash);
 		$customer_data = get_userdata( $customer_id );
 		$customer_email = $customer_data->user_email;
 		$date_exp = strtotime($date . "+1 days");
@@ -515,8 +522,21 @@ class Woocommerce_Loyalty_Program_Public {
 				update_post_meta( $new_coupon_id, '_wt_coupon_start_date', date('Y-m-d', $date_start) );
 
 				update_post_meta( $new_coupon_id, '_user_id', $customer_id );
+				update_post_meta( $new_coupon_id, '_coupon_from_loyalty_program', true );
 
 				update_user_meta( $customer_id, 'coupon_for_' . $name_celebrate, $coupon_code );
+
+				
+				if(get_post_meta($customer_id, '_coupons_count', true)) {
+					$coupon_count = get_post_meta($customer_id, '_coupons_count', true);
+				} else {
+					$coupon_count = 0;
+				}
+				
+				if(!$is_replace_promo) {
+					$coupon_count++;
+				}
+				update_user_meta( $customer_id, '_coupons_count', $coupon_count );
 				
 				return $coupon_code;
 			} else {
@@ -541,6 +561,7 @@ class Woocommerce_Loyalty_Program_Public {
 		unset($clean_data_array['last_name']);
 		unset($clean_data_array['user_id']);
 		unset($clean_data_array['action']);
+		unset($clean_data_array['repeats']);
 		
 
 		$data_array = array("email" => $customer_email);
@@ -555,7 +576,14 @@ class Woocommerce_Loyalty_Program_Public {
 			if (strpos($key, 'datesend_') === 0) {
 				$clean_name_date = str_replace('datesend_', '', $key);
 				$data_array['variables'][$clean_name_date] = $value;
-				$promocode = $this->generate_promocode($clean_name_date, $value, $user_id);
+				if(get_user_meta($user_id, 'coupon_for_' . $clean_name_date, true)){
+					$old_promocode = get_user_meta($user_id, 'coupon_for_' . $clean_name_date, true);
+					$coupon_id = wc_get_coupon_id_by_code( $old_promocode);
+					wp_trash_post($coupon_id);
+					$promocode = $this->generate_promocode($clean_name_date, $value, $user_id, true);
+				} else {
+					$promocode = $this->generate_promocode($clean_name_date, $value, $user_id, false);
+				}
 				$data_array['variables']['coupon_'.$clean_name_date] = $promocode;
 				update_user_meta( $user_id, $clean_name_date . '_date', $value );
 				update_user_meta( $user_id, $clean_name_date . '_name_celebrate', $full_name);
@@ -624,6 +652,10 @@ class Woocommerce_Loyalty_Program_Public {
 		delete_user_meta($user_id, '_date_coupon_exp_' . $date_slug);
 
 		echo json_encode($data_array);
+
+		$coupon_count = get_post_meta($user_id, '_coupons_count', true);
+		$coupon_count--;
+		update_user_meta( $user_id, '_coupons_count', $coupon_count );
 
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
