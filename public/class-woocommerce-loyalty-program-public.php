@@ -257,7 +257,6 @@ class Woocommerce_Loyalty_Program_Public {
 				// update_user_meta( $customer_id, 'test_name_date' . $key, $date_arr[0] );
 				// update_user_meta( $customer_id, 'test_date_date' . $key, $date_arr[1] );
 
-				update_user_meta( $customer_id, $date_arr[0] . '_date', $date_arr[1] );
 				
 				if(!empty($date_arr[2])) {
 					update_user_meta( $customer_id, $date_arr[0] . '_custom_name', $date_arr[2] );
@@ -287,11 +286,13 @@ class Woocommerce_Loyalty_Program_Public {
 				);
 	
 				$current_celebrate = get_posts($args);
-				update_user_meta( $customer_id, $date_arr[0] . '_test', json_encode($current_celebrate) );
-	
+				update_user_meta( $customer_id, $date_arr[0] . '_test', json_encode($current_celebrate) );	
 	
 				$date_for_sendpulse_array = explode('.', $date_arr[1]);
-				$date_for_sendpulse = $date_for_sendpulse_array[1] . '/' .$date_for_sendpulse_array[0] . '/' . $date_for_sendpulse_array[2];
+				$date_for_sendpulse =  $date_for_sendpulse_array[2] . '-' .$date_for_sendpulse_array[1] . '-' . $date_for_sendpulse_array[0];
+
+				update_user_meta( $customer_id, $date_arr[0] . '_date', $date_for_sendpulse );
+
 				$data_array['variables'][$date_arr[0]] = $date_for_sendpulse;
 	
 				if($name_celebrate != '- -') {
