@@ -125,6 +125,7 @@ class Woocommerce_Loyalty_Program_Public {
 			'post_type' => $this->loyalty_program_post_type,
 			'post_status' => 'publish',
 			'posts_per_page' => -1,
+			'order' => 'ASC'
 		) );
 		?>
 			<a href="#add_notification_dates" data-open="#add_notification_dates" class="primary is-small button wp-element-button is-outline"><?php echo __( 'Add date', 'woocommerce-loyalty-program' );?></a>
