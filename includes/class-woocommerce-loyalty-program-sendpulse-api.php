@@ -121,6 +121,8 @@ class SendPulseApi {
 
 		$response_array = json_decode($response, true);
 
+		update_user_meta($user_id, '_api_response', $response);
+
 		if(isset($response_array['result']) and $response_array['result']){ 
 			return $response_array['result'];
 		} else {

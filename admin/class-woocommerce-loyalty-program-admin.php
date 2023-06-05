@@ -60,7 +60,7 @@ class Woocommerce_Loyalty_Program_Admin {
 
 		add_action( 'edit_user_profile', [ $this, 'add_custom_meta_fields_admin'] );
 		// add_action('add_meta_boxes', [ $this, 'add_custom_meta_boxes']);
-		add_action('save_user_profile', [ $this, 'save_custom_meta_fields_admin']);
+		add_action('edit_user_profile_update', [ $this, 'save_custom_meta_fields_admin']);
 		// add_action( 'edit_user_profile_update', 'true_save_profile_fields' );
 	}
 
@@ -313,10 +313,10 @@ class Woocommerce_Loyalty_Program_Admin {
 			
 			$coupones = get_posts( array(
 				'post_type' => 'shop_coupon',
-				'post_status' => 'publish',
 				'posts_per_page' => -1,
 				'meta_key'    => '_used_by',
 				'meta_value'  => $id,
+				'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash')
 			) );
 			if(get_user_meta($id, '_coupons_count', true)) {
 				$user->data->all_coupons = get_user_meta($id, '_coupons_count', true);
@@ -390,12 +390,13 @@ class Woocommerce_Loyalty_Program_Admin {
 			'posts_per_page' => -1
 		);
 		$dates = get_posts($args);
+		echo '<h3 id="loyalty">Loyalty fields</h3>';
 		foreach($dates as $date) {
 			$id = $date->ID;
 			$celeb_date = get_post_meta($id, '_date_discount', true);
 			$is_personal_date = get_post_meta($id, '_is_personal_date', true);
 
-			echo '<h3 id="loyalty">Loyalty fields</h3>';
+			echo '<h4>Fields for "'. $date->post_title.'"</h3>';
  
 			// поля в профиле находятся в рамметке таблиц <table>
 			echo '<table class="form-table">';
@@ -410,7 +411,7 @@ class Woocommerce_Loyalty_Program_Admin {
 			$user_name_celebrate = get_the_author_meta( $date->post_name . '_name_celebrate', $user->ID );
 
 			echo '<tr><th><label for="city">Name for "'. $date->post_title.'"</label></th>
-			<td><input type="text" name="'. $date->post_name.'_name_celebrate" id="'. $date->post_name.'_name_celebrate" value="' . esc_attr( $user_name_celebrate ) . '" class="addDatepicker" /></td>
+			<td><input type="text" name="'. $date->post_name.'_name_celebrate" id="'. $date->post_name.'_name_celebrate" value="' . esc_attr( $user_name_celebrate ) . '" class="regular-tex" /></td>
 			</tr>';
 
 			if($is_personal_date) {
@@ -439,10 +440,19 @@ class Woocommerce_Loyalty_Program_Admin {
 		$data_array['variables'] = array();
 
 		foreach($dates as $date) {
-			if (isset($_POST[$date->post_name])) {
+			if (isset($_POST[$date->post_name]) and !empty($_POST[$date->post_name])) {
+
+				update_user_meta($user_id, '_post_test', json_encode($_POST));
+				update_user_meta($user_id, '_post_test_'.$date->post_name, gettype($_POST[$date->post_name]));
 				$date_old = $_POST[$date->post_name];
-				$date_old =  explode('/', $date_old);
-				$new_date = $date[2].'-'.$date[1].'-'.$date[0];
+				$new_date = $date_old;
+				if(strpos($date_old, '/')) {
+					$date_old =  explode('/', $date_old);
+					$new_date = $date_old[2].'-'.$date_old[1].'-'.$date_old[0];
+				} elseif(strpos($date_old, '.')) {
+					$date_old =  explode('.', $date_old);
+					$new_date = $date_old[2].'-'.$date_old[1].'-'.$date_old[0];
+				}
 				
 				if(get_user_meta($user_id, $date->post_name.'_date', true)) {
 					if(get_user_meta($user_id, $date->post_name.'_date', true) != $new_date) {
@@ -451,18 +461,32 @@ class Woocommerce_Loyalty_Program_Admin {
 						wp_trash_post($coupon_id);
 						update_user_meta($user_id, $date->post_name.'_date', $new_date);
 						$promocode = $this->generate_promocode($date->post_name, $new_date, $user_id, true);
+					} else {
+						$promocode =  get_user_meta($user_id, 'coupon_for_' . $date->post_name, true);
 					}
 				} else {
 					$promocode = $this->generate_promocode($date->post_name, $new_date, $user_id, false);
+					update_user_meta($user_id, $date->post_name.'_date', $new_date);
 				}
 				$data_array['variables'][$date->post_name] = $new_date;
 				$data_array['variables']['coupon_'.$date->post_name] = $promocode;
 			} else {
 				$data_array['variables'][$date->post_name] = '0000-01-01';
 				$data_array['variables']['coupon_'.$date->post_name] = '';
+				if(get_user_meta($user_id, 'coupon_for_' . $date->post_name, true)) {
+					$old_promocode = get_user_meta($user_id, 'coupon_for_' . $date->post_name, true);
+					$coupon_id = wc_get_coupon_id_by_code( $old_promocode);
+					wp_trash_post($coupon_id);
+				}
+				if(get_user_meta($user_id, $date->post_name.'_date', true)) {
+					$coupon_count = get_user_meta($user_id, '_coupons_count', true);
+					$coupon_count--;
+					update_user_meta( $user_id, '_coupons_count', $coupon_count );
+					update_user_meta( $user_id, $date->post_name.'_date', '' );
+				}
 			}
 
-			if (isset($_POST[$date->post_name . '_name_celebrate'])) {
+			if (isset($_POST[$date->post_name . '_name_celebrate'])  and !empty($_POST[$date->post_name . '_name_celebrate'])) {
 				$name_celebrate = $_POST[$date->post_name . '_name_celebrate'];
 				update_user_meta($user_id, $date->post_name.'_name_celebrate', $name_celebrate);
 				$data_array['variables']['name_'.$date->post_name] = $name_celebrate;
@@ -470,15 +494,18 @@ class Woocommerce_Loyalty_Program_Admin {
 				$data_array['variables']['name_'.$date->post_name] = '';
 			}
 
-			if (isset($_POST[$date->post_name .'_custom_name'])) {
+			if (isset($_POST[$date->post_name .'_custom_name'])  and !empty($_POST[$date->post_name .'_custom_name'])) {
 				$custom_name = $_POST[$date->post_name .'_custom_name'];
 				update_user_meta($user_id, $date->post_name.'_custom_name', $custom_name);
 				$data_array['variables']['custom_name_'.$date->post_name] = $custom_name;
 			} else {
 				$data_array['variables']['custom_name_'.$date->post_name] = '';
 			}
-
 		}
+		update_user_meta($user_id, '_suuuqa', json_encode($data_array));
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woocommerce-loyalty-program-sendpulse-api.php';
+		$sendPulse = new SendPulseApi;
+		$sendPulse->add_new_and_change_address($data_array, $user_id);
 	}
 
 

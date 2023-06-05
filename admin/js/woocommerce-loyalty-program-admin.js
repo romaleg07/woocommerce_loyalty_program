@@ -76,7 +76,7 @@
 			let html = '';
 			for (let user of response) {
 				html += `<tr>`
-				html += `<td><a href="/wp-admin/user-edit.php?user_id=${user.ID}" target="_blank">${user.data.first_name} ${user.data.last_name}(${user.data.user_email})</a></td>`
+				html += `<td><a href="/wp-admin/user-edit.php?user_id=${user.ID}#loyalty" target="_blank">${user.data.first_name} ${user.data.last_name}(${user.data.user_email})</a></td>`
 				html += `<td>${user.data.all_coupons}</td>`
 				html += `<td>${user.data.used_coupons}</td>`
 				html += `</tr>`
