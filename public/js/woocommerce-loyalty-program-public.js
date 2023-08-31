@@ -29,8 +29,7 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
-	
-	$('.datePicker_wrapper  input').datepicker();
+
 
 	$('.notification_dates-item').on('click', function(e) {
 		const input = $(this).find('.input-text')
@@ -51,7 +50,7 @@
 		const wrapper_date = $('#add_notification_dates')
 		const name_date = $('#add_date_new_firs_name').val() || '-'
 		const last_name_date = $('#add_date_new_last_name').val() || '-'
-		const button = $('a[href="#add_notification_dates"]')
+		const button = $('a[data-target="#add_notification_dates"]')
 		let date
 		let date_slug
 
@@ -71,8 +70,10 @@
 					date_arr[date_slug] = date
 				}
 
-				let visible_date = date.split('.')
-				visible_date = `${visible_date[0]}.${visible_date[1]}`
+				let visible_date = date.split('-')
+				visible_date = `${visible_date[2]}.${visible_date[1]}`
+				console.log(visible_date)
+				console.log(date)
 
 				let generated_class = `${date_slug}${name_date.replaceAll(/\s/g,'')}${last_name_date.replaceAll(/\s/g,'')}`
 
@@ -92,7 +93,8 @@
 			}
 
 			if(index === (len_items - 1)) {
-				$('#add_notification_dates').magnificPopup('close')
+				// $('#add_notification_dates').magnificPopup('close')
+				customHideModal($('#add_notification_dates'))
 				$('.personal-date .date-name-wrapper').slideUp()
 				$('#add_notification_dates input').each(function() {
 					if($(this).attr('type') == 'checkbox') {
@@ -117,7 +119,7 @@
 		let date_arr = {}
 		const name_date = $('#add_date_new_firs_name').val() || '-'
 		const last_name_date = $('#add_date_new_last_name').val() || '-'
-		const button = $('a[href="#add_notification_dates"]')
+		const button = $('a[data-target="#add_notification_dates"]')
 		let date
 		let date_slug
 		let user_id = $('#current_user_id').val();
@@ -136,12 +138,12 @@
 					$(this).find('.input-date_with_datepicker').addClass('empty')
 					return false
 				} else {
-					let api_date = date.split('.')
-					date_arr[`datesend_${date_slug}`] = `${api_date[2]}-${api_date[1]}-${api_date[0]}`
+					let api_date = date.split('-')
+					date_arr[`datesend_${date_slug}`] = `${api_date[0]}-${api_date[1]}-${api_date[2]}`
 				}
 
-				let visible_date = date.split('.')
-				visible_date = `${visible_date[0]}.${visible_date[1]}`
+				let visible_date = date.split('-')
+				visible_date = `${visible_date[2]}.${visible_date[1]}`
 
 				let generated_class = `${date_slug}${name_date.replaceAll(/\s/g,'')}${last_name_date.replaceAll(/\s/g,'')}`
 
@@ -169,7 +171,8 @@
 			}
 
 			if(index === (len_items - 1)) {
-				$('#add_notification_dates').magnificPopup('close')
+				// $('#add_notification_dates').magnificPopup('close')
+				customHideModal($('#add_notification_dates'))
 				$('.personal-date .date-name-wrapper').slideUp()
 				$('#add_notification_dates input').each(function() {
 					if($(this).attr('type') == 'checkbox') {
@@ -211,6 +214,16 @@
 			// console.log(response);
 		} );
 	})
+
+
+	function customHideModal(modal) {
+		$('body').removeClass('modal-open')
+		$('body').css('padding-right', 0)
+		modal.removeClass('show')
+		modal.css('display', 'none')
+		$('.modal-backdrop').removeClass('show')
+		$('.modal-backdrop').css('display', 'none')
+	}
 	
 
 })( jQuery );

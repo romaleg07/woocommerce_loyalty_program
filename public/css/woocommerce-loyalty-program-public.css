@@ -108,3 +108,18 @@
 .change_date_pa {
     display: none;
 }
+#add_notification_dates .col-full {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+#add_notification_dates h3 {
+   width: 100%;
+}
+
+#add_notification_dates .add_notification_date--info {
+    width: 100%;
+}
+.notification_dates-wrapper {
+    width: 100%;
+}

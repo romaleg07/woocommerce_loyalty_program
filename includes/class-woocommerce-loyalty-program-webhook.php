@@ -86,7 +86,7 @@ class LoyaltyProgramWebhook {
 										
 					update_post_meta( $new_coupon_id, 'exclude_product_ids', '' );
 					update_post_meta( $new_coupon_id, 'usage_limit', '1' );
-					update_post_meta( $new_coupon_id, 'expiry_date', '' );
+					update_post_meta( $new_coupon_id, 'expiry_date', $date_exp );
 					update_post_meta( $new_coupon_id, 'apply_before_tax', 'yes' );
 					update_post_meta( $new_coupon_id, 'free_shipping', 'no' );
 					update_post_meta( $new_coupon_id, 'customer_email', array($customer_email) );

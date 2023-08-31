@@ -112,7 +112,7 @@ function render_discount_amount_field_meta_box( $post ) {
 	</p>
 	<p class="form-field _add_date">
 		<label for="_add_date_discount"><?php echo __('Date:', 'woocommerce-loyalty-program');?></label>
-		<input type="text" class="addDatepicker" name="_add_date_discount" id="_add_date_discount" placeholder="DD-MM-YYYY" value="<?php echo esc_attr( $date_discount ); ?>">
+		<input type="date" class="" name="_add_date_discount" id="_add_date_discount" placeholder="YYYY-MM-DD" value="<?php echo esc_attr( $date_discount ); ?>">
 	</p>
 	<p class="form-field">
 		<label for="_id_email_sendpulse"><?php echo __('Id in mailing list in SendPulse:', 'woocommerce-loyalty-program');?></label>

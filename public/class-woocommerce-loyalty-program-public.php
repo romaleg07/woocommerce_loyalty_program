@@ -114,7 +114,7 @@ class Woocommerce_Loyalty_Program_Public {
 		 */
 
 		wp_enqueue_script('jquery-ui-datepicker');
-		wp_enqueue_script( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'js/woocommerce-loyalty-program-public.js', array( 'jquery' ), $this->version, true );
+		wp_enqueue_script( $this->woocommerce_loyalty_program, plugin_dir_url( __FILE__ ) . 'js/woocommerce-loyalty-program-public.js', array(  ), $this->version, true );
 
 	}
 
@@ -128,7 +128,7 @@ class Woocommerce_Loyalty_Program_Public {
 			'order' => 'ASC'
 		) );
 		?>
-			<a href="#add_notification_dates" data-open="#add_notification_dates" class="primary is-small button wp-element-button is-outline"><?php echo __( 'Add date', 'woocommerce-loyalty-program' );?></a>
+			<a href="#" data-toggle="modal" data-target="#add_notification_dates" class="primary is-small button wp-element-button is-outline"><?php echo __( 'Add date', 'woocommerce-loyalty-program' );?></a>
 
 			<p class="form-row">
 				<label class="woocommerce-form__label woocommerce-form__label-for-checkbox woocommerce-form-login__notification_flag">
@@ -136,67 +136,71 @@ class Woocommerce_Loyalty_Program_Public {
 				</label>
 			</p>
 
-			<div id="add_notification_dates" class="dark text-center mfp-hide lightbox-content">
-				<div class="account-container lightbox-inner">
-					<div class="row row-divided row-large" id="add_user_date">
-						<div class="col-1 large-12 col pb-0">
-							<h3 class="uppercase"><?php echo __( 'Add date notification', 'woocommerce-loyalty-program' );?></h3>
-							<p class="form-row form-row-first">
-								<label for="add_date_new_firs_name"><?php echo __( 'First Name', 'woocommerce-loyalty-program' );?></label>
-								<input type="text" class="input-text" name="add_date_new_firs_name" id="add_date_new_firs_name" value="">
-							</p>
-							<p class="form-row form-row-last">
-								<label for="add_date_new_firs_name"><?php echo __( 'Last Name', 'woocommerce-loyalty-program' );?></label>
-								<input type="text" class="input-text" name="add_date_new_last_name" id="add_date_new_last_name" value="">
-							</p>
-							<!-- <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-								<label for="reg_email">Email&nbsp;<span class="required">*</span></label>
-								<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="">
-							</p> -->
+			<div id="add_notification_dates" class="dark text-center modal fade lightbox-content" aria-hidden="true">
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="account-container lightbox-inner">
+							<div class="row row-divided row-large" id="add_user_date">
+								<div class="col-full">
+									<h3 class="uppercase"><?php echo __( 'Add date notification', 'woocommerce-loyalty-program' );?></h3>
+									<p class="form-row form-row-first">
+										<label for="add_date_new_firs_name"><?php echo __( 'First Name', 'woocommerce-loyalty-program' );?></label>
+										<input type="text" class="input-text" name="add_date_new_firs_name" id="add_date_new_firs_name" value="">
+									</p>
+									<p class="form-row form-row-last">
+										<label for="add_date_new_firs_name"><?php echo __( 'Last Name', 'woocommerce-loyalty-program' );?></label>
+										<input type="text" class="input-text" name="add_date_new_last_name" id="add_date_new_last_name" value="">
+									</p>
+									<!-- <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+										<label for="reg_email">Email&nbsp;<span class="required">*</span></label>
+										<input type="email" class="woocommerce-Input woocommerce-Input--text input-text" name="email" id="reg_email" autocomplete="email" value="">
+									</p> -->
 
-							<p class="add_notification_date--info">
-								<?php echo __( 'Mark the events you want to be notified about. You will receive an email notification a few days before the event. By mail with the offer of the desired package.', 'woocommerce-loyalty-program' );?>
-							</p>
+									<p class="add_notification_date--info">
+										<?php echo __( 'Mark the events you want to be notified about. You will receive an email notification a few days before the event. By mail with the offer of the desired package.', 'woocommerce-loyalty-program' );?>
+									</p>
 
-							<?php if(!empty($posts)) { ?>
-								<div class="notification_dates-wrapper">
-								<?php 
-									foreach($posts as $date): 
-									$id = $date->ID;
-									$celeb_date = get_post_meta($id, '_date_discount', true);
-									$is_personal_date = get_post_meta($id, '_is_personal_date', true);
-									if(!empty($celeb_date)) {
-										$celeb_date = strtotime($celeb_date);
-										$newformat_date = date("j, F", $celeb_date);
-										$newformat_date_value = date("d.m.Y", $celeb_date);
-									}
-									
-								?>
-									<div class="notification_dates-item <?php if($is_personal_date) echo 'personal-date';?>">
-										<input type="checkbox" name="date_notify" value="<?php echo $date->post_name; ?>">
-										<span><?php echo $date->post_title; ?></span>
-										<?php if(!empty($celeb_date)): ?>
-										<div class="date-wrapper">
-											<?php echo $newformat_date; ?>
-											<input type="hidden" name="" class="input-date_with_datepicker" value="<?php echo $newformat_date_value; ?>" id="">
-										</div>
-										<?php else: ?>
-										<div class="date-wrapper datePicker_wrapper chose_date">
-											<input type="text" class="woocommerce-Input woocommerce-Input--text input-date_with_datepicker input-text" placeholder="<?php echo __( 'Choose date', 'woocommerce-loyalty-program' );?>" name="chosen_date_<?php echo $date->post_name; ?>" id="chosen_date_<?php echo $date->post_name; ?>" autocomplete="off">
-										</div>
-										<?php endif; ?>
+									<?php if(!empty($posts)) { ?>
+										<div class="notification_dates-wrapper">
+										<?php 
+											foreach($posts as $date): 
+											$id = $date->ID;
+											$celeb_date = get_post_meta($id, '_date_discount', true);
+											$is_personal_date = get_post_meta($id, '_is_personal_date', true);
+											if(!empty($celeb_date)) {
+												$celeb_date = strtotime($celeb_date);
+												$newformat_date = date("j, F", $celeb_date);
+												$newformat_date_value = date("Y-m-d", $celeb_date);
+											}
+											
+										?>
+											<div class="notification_dates-item <?php if($is_personal_date) echo 'personal-date';?>">
+												<input type="checkbox" name="date_notify" value="<?php echo $date->post_name; ?>">
+												<span><?php echo $date->post_title; ?></span>
+												<?php if(!empty($celeb_date)): ?>
+												<div class="date-wrapper">
+													<?php echo $newformat_date; ?>
+													<input type="hidden" name="" class="input-date_with_datepicker" value="<?php echo $newformat_date_value; ?>" id="">
+												</div>
+												<?php else: ?>
+												<div class="date-wrapper datePicker_wrapper chose_date">
+													<input type="date" class="woocommerce-Input woocommerce-Input--text input-date_with_datepicker input-text" placeholder="<?php echo __( 'Choose date', 'woocommerce-loyalty-program' );?>" name="chosen_date_<?php echo $date->post_name; ?>" id="chosen_date_<?php echo $date->post_name; ?>" autocomplete="off">
+												</div>
+												<?php endif; ?>
 
-										<?php if($is_personal_date):?>
-											<div class="date-name-wrapper">
-												<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" placeholder="<?php echo __( 'Enter a name', 'woocommerce-loyalty-program' );?>" name="custom_name_<?php echo $date->post_name; ?>" id="custom_name_<?php echo $date->post_name; ?>" autocomplete="off">
+												<?php if($is_personal_date):?>
+													<div class="date-name-wrapper">
+														<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" placeholder="<?php echo __( 'Enter a name', 'woocommerce-loyalty-program' );?>" name="custom_name_<?php echo $date->post_name; ?>" id="custom_name_<?php echo $date->post_name; ?>" autocomplete="off">
+													</div>
+												<?php endif; ?>
+												
 											</div>
-										<?php endif; ?>
-										
-									</div>
-								<?php endforeach; ?>
-								<a href="#" id="add_new_date_notification" class="woocommerce-button button"><?php echo __( 'Add', 'woocommerce-loyalty-program' );?></a>
+										<?php endforeach; ?>
+										<a href="#" id="add_new_date_notification" class="woocommerce-button button"><?php echo __( 'Add', 'woocommerce-loyalty-program' );?></a>
+										</div>
+									<?php } ?>
 								</div>
-							<?php } ?>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -232,11 +236,11 @@ class Woocommerce_Loyalty_Program_Public {
 		if(isset($_POST['billing_phone'])){
 			$data_array['variables']['Phone'] = sanitize_text_field($_POST['billing_phone']);
 		}
-		if(isset($_POST['billing_first_name'])){
-			$data_array['variables']['name'] = sanitize_text_field($_POST['billing_first_name']);
+		if(isset($_POST['first_name'])){
+			$data_array['variables']['name'] = sanitize_text_field($_POST['first_name']);
 		}
-		if(isset($_POST['billing_last_name'])){
-			$data_array['variables']['last_name'] = sanitize_text_field($_POST['billing_last_name']);
+		if(isset($_POST['last_name'])){
+			$data_array['variables']['last_name'] = sanitize_text_field($_POST['last_name']);
 		}
 
 		if (isset($_POST['notify_dates']) and !empty($_POST['notify_dates']) ) {
@@ -289,7 +293,7 @@ class Woocommerce_Loyalty_Program_Public {
 				$current_celebrate = get_posts($args);
 				update_user_meta( $customer_id, $date_arr[0] . '_test', json_encode($current_celebrate) );	
 	
-				$date_for_sendpulse_array = explode('.', $date_arr[1]);
+				$date_for_sendpulse_array = explode('-', $date_arr[1]);
 				$date_for_sendpulse =  $date_for_sendpulse_array[2] . '-' .$date_for_sendpulse_array[1] . '-' . $date_for_sendpulse_array[0];
 
 				update_user_meta( $customer_id, $date_arr[0] . '_date', $date_for_sendpulse );
@@ -408,66 +412,70 @@ class Woocommerce_Loyalty_Program_Public {
 					}
 				}
 			?>
-			<a href="#add_notification_dates" data-open="#add_notification_dates" class="primary is-small button wp-element-button is-outline"><?php echo __('Add new date', 'woocommerce-loyalty-program');?> +</a>
+			<a href="#" data-toggle="modal" data-target="#add_notification_dates" class="primary is-small button wp-element-button is-outline"><?php echo __('Add new date', 'woocommerce-loyalty-program');?> +</a>
 		</div>
 
-		<div id="add_notification_dates" class="dark text-center mfp-hide lightbox-content">
-			<div class="account-container lightbox-inner">
-				<div class="row row-divided row-large" id="add_user_date">
-					<div class="col-1 large-12 col pb-0">
-						<h3 class="uppercase"><?php echo __( 'Add date notification', 'woocommerce-loyalty-program' );?></h3>
-						<p class="form-row form-row-first">
-							<label for="add_date_new_firs_name"><?php echo __( 'First Name', 'woocommerce-loyalty-program' );?></label>
-							<input type="text" class="input-text" name="add_date_new_firs_name" id="add_date_new_firs_name" value="">
-						</p>
-						<p class="form-row form-row-last">
-							<label for="add_date_new_firs_name"><?php echo __( 'Last Name', 'woocommerce-loyalty-program' );?></label>
-							<input type="text" class="input-text" name="add_date_new_last_name" id="add_date_new_last_name" value="">
-						</p>
+		<div id="add_notification_dates" class="dark text-center modal fade lightbox-content" aria-hidden="true">
+			<div class="modal-dialog modal-lg" role="document">
+				<div class="modal-content">
+					<div class="account-container lightbox-inner">
+						<div class="row row-divided row-large" id="add_user_date">
+							<div class="col-full">
+								<h3 class="uppercase"><?php echo __( 'Add date notification', 'woocommerce-loyalty-program' );?></h3>
+								<p class="form-row form-row-first">
+									<label for="add_date_new_firs_name"><?php echo __( 'First Name', 'woocommerce-loyalty-program' );?></label>
+									<input type="text" class="input-text" name="add_date_new_firs_name" id="add_date_new_firs_name" value="">
+								</p>
+								<p class="form-row form-row-last">
+									<label for="add_date_new_firs_name"><?php echo __( 'Last Name', 'woocommerce-loyalty-program' );?></label>
+									<input type="text" class="input-text" name="add_date_new_last_name" id="add_date_new_last_name" value="">
+								</p>
 
-						<p class="add_notification_date--info">
-							<?php echo __( 'Mark the events you want to be notified about. You will receive an email notification a few days before the event. By mail with the offer of the desired package.', 'woocommerce-loyalty-program' );?>
-						</p>
+								<p class="add_notification_date--info">
+									<?php echo __( 'Mark the events you want to be notified about. You will receive an email notification a few days before the event. By mail with the offer of the desired package.', 'woocommerce-loyalty-program' );?>
+								</p>
 
-						<?php if(!empty($posts)) { ?>
-							<div class="notification_dates-wrapper">
-							<?php 
-								foreach($posts as $date): 
-								$id = $date->ID;
-								$celeb_date = get_post_meta($id, '_date_discount', true);
-								$is_personal_date = get_post_meta($id, '_is_personal_date', true);
-								if(!empty($celeb_date)) {
-									$celeb_date = strtotime($celeb_date);
-									$newformat_date = date("j, F", $celeb_date);
-									$newformat_date_value = date("d.m.Y", $celeb_date);
-								}
-								
-							?>
-								<div class="notification_dates-item <?php if($is_personal_date) echo 'personal-date';?>">
-									<input type="checkbox" name="date_notify" value="<?php echo $date->post_name; ?>">
-									<span><?php echo $date->post_title; ?></span>
-									<?php if(!empty($celeb_date)): ?>
-									<div class="date-wrapper">
-										<?php echo $newformat_date; ?>
-										<input type="hidden" name="" class="input-date_with_datepicker" value="<?php echo $newformat_date_value; ?>" id="">
-									</div>
-									<?php else: ?>
-									<div class="date-wrapper datePicker_wrapper chose_date">
-										<input type="text" class="woocommerce-Input woocommerce-Input--text input-date_with_datepicker input-text" placeholder="<?php echo __( 'Choose date', 'woocommerce-loyalty-program' );?>" name="chosen_date_<?php echo $date->post_name; ?>" id="chosen_date_<?php echo $date->post_name; ?>" autocomplete="off">
-									</div>
-									<?php endif; ?>
+								<?php if(!empty($posts)) { ?>
+									<div class="notification_dates-wrapper">
+									<?php 
+										foreach($posts as $date): 
+										$id = $date->ID;
+										$celeb_date = get_post_meta($id, '_date_discount', true);
+										$is_personal_date = get_post_meta($id, '_is_personal_date', true);
+										if(!empty($celeb_date)) {
+											$celeb_date = strtotime($celeb_date);
+											$newformat_date = date("j, F", $celeb_date);
+											$newformat_date_value = date("d.m.Y", $celeb_date);
+										}
+										
+									?>
+										<div class="notification_dates-item <?php if($is_personal_date) echo 'personal-date';?>">
+											<input type="checkbox" name="date_notify" value="<?php echo $date->post_name; ?>">
+											<span><?php echo $date->post_title; ?></span>
+											<?php if(!empty($celeb_date)): ?>
+											<div class="date-wrapper">
+												<?php echo $newformat_date; ?>
+												<input type="hidden" name="" class="input-date_with_datepicker" value="<?php echo $newformat_date_value; ?>" id="">
+											</div>
+											<?php else: ?>
+											<div class="date-wrapper datePicker_wrapper chose_date">
+												<input type="date" class="woocommerce-Input woocommerce-Input--text input-date_with_datepicker input-text" placeholder="<?php echo __( 'Choose date', 'woocommerce-loyalty-program' );?>" name="chosen_date_<?php echo $date->post_name; ?>" id="chosen_date_<?php echo $date->post_name; ?>" autocomplete="off">
+											</div>
+											<?php endif; ?>
 
-									<?php if($is_personal_date):?>
-										<div class="date-name-wrapper">
-											<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" placeholder="<?php echo __( 'Enter a name', 'woocommerce-loyalty-program' );?>" name="custom_name_<?php echo $date->post_name; ?>" id="custom_name_<?php echo $date->post_name; ?>" autocomplete="off">
+											<?php if($is_personal_date):?>
+												<div class="date-name-wrapper">
+													<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" placeholder="<?php echo __( 'Enter a name', 'woocommerce-loyalty-program' );?>" name="custom_name_<?php echo $date->post_name; ?>" id="custom_name_<?php echo $date->post_name; ?>" autocomplete="off">
+												</div>
+											<?php endif; ?>
+											
 										</div>
-									<?php endif; ?>
-									
-								</div>
-							<?php endforeach; ?>
-							<a href="#" id="add_new_date_notification_pk" class="woocommerce-button button"><?php echo __( 'Add', 'woocommerce-loyalty-program' );?></a>
+									<?php endforeach; ?>
+									<a href="#" id="add_new_date_notification_pk" class="woocommerce-button button"><?php echo __( 'Add', 'woocommerce-loyalty-program' );?></a>
+									</div>
+								<?php } ?>
 							</div>
-						<?php } ?>
+						</div>
 					</div>
 				</div>
 			</div>
