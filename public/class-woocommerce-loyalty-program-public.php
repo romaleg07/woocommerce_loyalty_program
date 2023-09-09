@@ -445,7 +445,7 @@ class Woocommerce_Loyalty_Program_Public {
 										if(!empty($celeb_date)) {
 											$celeb_date = strtotime($celeb_date);
 											$newformat_date = date("j, F", $celeb_date);
-											$newformat_date_value = date("d.m.Y", $celeb_date);
+											$newformat_date_value = date("Y-m-d", $celeb_date);
 										}
 										
 									?>
